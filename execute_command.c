@@ -20,7 +20,7 @@ int is_only_spaces(char *str)
 }
 
 /**
-	* execute_command - executes a command
+	* execute_command - executes a command with arguments
 	* @line: input line
 	* @prog_name: program name
 	*
@@ -29,23 +29,27 @@ int is_only_spaces(char *str)
 int execute_command(char *line, char *prog_name)
 {
 	pid_t pid;
-	char *argv[2];
-	char *cmd;
+	char *argv[1024];
+	int argc = 0;
+	char *token;
 
-	cmd = strtok(line, " \t\n");
-	if (!cmd)
+	token = strtok(line, " \t\n");
+	while (token != NULL && argc < 1023)
+	{
+	argv[argc++] = token;
+	token = strtok(NULL, " \t\n");
+	}
+	argv[argc] = NULL;
+
+	if (argc == 0)
 	return (0);
-
-	argv[0] = cmd;
-	argv[1] = NULL;
 
 	pid = fork();
 	if (pid == 0)
 	{
-	if (execve(cmd, argv, environ) == -1)
+	if (execve(argv[0], argv, environ) == -1)
 	{
-	fprintf(stderr, "%s: No such file or directory\n",
-	prog_name);
+	fprintf(stderr, "%s: No such file or directory\n", prog_name);
 	exit(127);
 	}
 	}

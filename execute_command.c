@@ -92,7 +92,7 @@ int execute_command(char *line, char *prog_name)
  */
 char *find_path(char *command)
 {
-	char *path = getenv("PATH");
+	char *path = get_env_value("PATH");
 	char *path_copy, *dir, full_path[1024];
 
 	if (!path)

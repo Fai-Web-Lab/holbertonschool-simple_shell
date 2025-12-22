@@ -7,6 +7,9 @@
 #include <string.h>
 #include <sys/wait.h>
 
+#define BUFFER_SIZE 102
+#define PROMPT "$ "
+
 extern char **environ;
 
 void run_shell(char *prog_name);

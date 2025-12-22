@@ -1,46 +1,56 @@
 #include "shell.h"
 
-extern char **environ;
+/**
+	* is_only_spaces - checks if string has only spaces
+	* @str: input string
+	*
+	* Return: 1 if only spaces, 0 otherwise
+	*/
+int is_only_spaces(char *str)
+{
+	int i = 0;
+
+	while (str[i])
+	{
+	if (str[i] != ' ' && str[i] != '\n' && str[i] != '\t')
+	return (0);
+	i++;
+	}
+	return (1);
+}
 
 /**
-	* execute_command - Executes a command using fork and execve
-	* @line: Command entered by the user
-	* @prog_name: Shell program name
-	* @line_number: Current command number
+	* execute_command - executes a command
+	* @line: input line
+	* @prog_name: program name
 	*
-	* Return: 0 on success, -1 on failure
+	* Return: 0
 	*/
-int execute_command(char *line, char *simple_shell, int line_number)
+int execute_command(char *line, char *prog_name)
 {
 	pid_t pid;
 	char *argv[2];
+	char *cmd;
 
-	(void)line_number;
+	cmd = strtok(line, " \t\n");
+	if (!cmd)
+	return (0);
 
-	line[strcspn(line, "\n")] = '\0';
-
-	argv[0] = line;
+	argv[0] = cmd;
 	argv[1] = NULL;
 
 	pid = fork();
-	if (pid == -1)
-	{
-	perror("fork");
-	return (-1);
-	}
-
 	if (pid == 0)
 	{
-	if (execve(argv[0], argv, environ) == -1)
+	if (execve(cmd, argv, environ) == -1)
 	{
-	fprintf(stderr, "%s: %s: not found\n", simple_shell, argv[0]);
+	fprintf(stderr, "%s: No such file or directory\n",
+	prog_name);
 	exit(127);
 	}
 	}
 	else
-	{
 	wait(NULL);
-	}
 
 	return (0);
 }

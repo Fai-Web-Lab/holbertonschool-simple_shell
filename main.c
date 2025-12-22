@@ -1,15 +1,16 @@
 #include "shell.h"
 
 /**
-	* main - Entry point of the shell
-	* @argc: argument count
-	* @argv: argument vector
+	* main - entry point
+	* @ac: argument count
+	* @av: argument vector
 	*
 	* Return: Always 0
 	*/
-int main(int argc, char **argv)
+int main(int ac, char **av)
 {
-	(void)argc;
-	run_shell(argv[0]);
+	(void)ac;
+
+	run_shell(av[0]);
 	return (0);
 }

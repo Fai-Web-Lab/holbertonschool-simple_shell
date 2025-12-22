@@ -1,31 +1,28 @@
 #include "shell.h"
 
 /**
-	* run_shell - Main loop of the shell
-	* @simple_shell: Name used to invoke the shell
+	* run_shell - main shell loop
+	* @prog_name: program name
 	*
 	* Return: Nothing
 	*/
-void run_shell(char *simple_shell)
+void run_shell(char *prog_name)
 {
-	char *lineptr = NULL;
-	size_t n = 0;
-	ssize_t nread;
-	int line_number = 0;
+	char *line = NULL;
+	size_t len = 0;
+	ssize_t read;
 
 	while (1)
 	{
 	if (isatty(STDIN_FILENO))
-	printf("($) ");
+	write(STDOUT_FILENO, "#cisfun$ ", 9);
 
-	nread = getline(&lineptr, &n, stdin);
-	if (nread == -1)
+	read = getline(&line, &len, stdin);
+	if (read == -1)
 	break;
 
-	line_number++;
-	if (nread > 1)
-	execute_command(lineptr, simple_shell, line_number);
+	if (!is_only_spaces(line))
+	execute_command(line, prog_name);
 	}
-
-	free(lineptr);
+	free(line);
 }

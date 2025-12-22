@@ -5,15 +5,12 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <string.h>
-#include <sys/types.h>
 #include <sys/wait.h>
 
-void run_shell(char *simple_shell);
-int execute_command(char *line, char *simple_shell, int line_number);
+extern char **environ;
 
-# define BUFFER_SIZE (1024)
-# define PROMPT_TEXT "$ "
-# define ERRFILE     "No such file or directory\n"
-# define ERRFOUND    "not found\n"
+void run_shell(char *prog_name);
+int execute_command(char *line, char *prog_name);
+int is_only_spaces(char *str);
 
 #endif

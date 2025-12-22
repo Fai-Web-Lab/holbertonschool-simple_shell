@@ -15,5 +15,6 @@ extern char **environ;
 void run_shell(char *prog_name);
 int execute_command(char *line, char *prog_name);
 int is_only_spaces(char *str);
+char *find_path(char *command);
 
 #endif

@@ -1,28 +1,45 @@
 #include "shell.h"
 
 /**
-	* run_shell - main shell loop
-	* @prog_name: program name
-	*
-	* Return: Nothing
-	*/
+ * run_shell - Main loop of the shell
+ * @prog_name: name of the shell program
+ */
 void run_shell(char *prog_name)
 {
-	char *line = NULL;
-	size_t len = 0;
-	ssize_t read;
+	char *lineptr = NULL;
+	size_t n = 0;
+	ssize_t nread;
 
 	while (1)
 	{
-	if (isatty(STDIN_FILENO))
-	write(STDOUT_FILENO, "#cisfun$ ", 9);
+		if (isatty(STDIN_FILENO))
+			printf("%s", PROMPT);
 
-	read = getline(&line, &len, stdin);
-	if (read == -1)
-	break;
+		nread = getline(&lineptr, &n, stdin);
+		if (nread == -1)
+			break;
 
-	if (!is_only_spaces(line))
-	execute_command(line, prog_name);
+		if (nread > 1 && !is_only_spaces(lineptr))
+			execute_command(lineptr, prog_name);
 	}
-	free(line);
+
+	free(lineptr);
+}
+/**
+ * is_only_spaces - checks if a string contains only whitespace
+ * @str: input string
+ *
+ * Return: 1 if only spaces, 0 otherwise
+ */
+int is_only_spaces(char *str)
+{
+	int i = 0;
+
+	while (str[i])
+	{
+		if (str[i] != ' ' && str[i] != '\n' && str[i] != '\t')
+			return (0);
+		i++;
+	}
+	return (1);
 }

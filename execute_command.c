@@ -1,60 +1,121 @@
 #include "shell.h"
 
 /**
-	* is_only_spaces - checks if string has only spaces
-	* @str: input string
-	*
-	* Return: 1 if only spaces, 0 otherwise
-	*/
-int is_only_spaces(char *str)
+ * tokenize_input - split input line into arguments
+ * @line: input line
+ * @argv: array to fill
+ *
+ * Return: number of arguments
+ */
+int tokenize_input(char *line, char **argv)
 {
-	int i = 0;
+	int argc = 0;
+	char *token = strtok(line, " \t\n");
 
-	while (str[i])
+	while (token && argc < BUFFER_SIZE - 1)
 	{
-	if (str[i] != ' ' && str[i] != '\n' && str[i] != '\t')
-	return (0);
-	i++;
+		argv[argc++] = token;
+		token = strtok(NULL, " \t\n");
 	}
-	return (1);
+
+	argv[argc] = NULL;
+	return (argc);
 }
 
 /**
-	* execute_command - executes a command with arguments
-	* @line: input line
-	* @prog_name: program name
-	*
-	* Return: 0
-	*/
+ * resolve_command_path - find full path of a command
+ * @argv: argument vector
+ * @prog_name: program name
+ *
+ * Return: pointer to path or NULL
+ */
+char *resolve_command_path(char **argv, char *prog_name)
+{
+	char *cmd_path;
+
+	if (strchr(argv[0], '/'))
+		return (argv[0]);
+
+	cmd_path = find_path(argv[0]);
+	if (!cmd_path)
+	{
+		fprintf(stderr, "%s: %s: not found\n", prog_name, argv[0]);
+		return (NULL);
+	}
+
+	return (cmd_path);
+}
+/**
+ * execute_command - executes a command with arguments
+ * @line: input line
+ * @prog_name: program name
+ *
+ * Return: 0
+ */
 int execute_command(char *line, char *prog_name)
 {
 	pid_t pid;
-	char *argv[1024];
-	int argc = 0;
-	char *token;
+	char *argv[BUFFER_SIZE];
+	char *cmd_path;
+	int argc;
 
-	token = strtok(line, " \t\n");
-	while (token != NULL && argc < 1023)
-	{
-	argv[argc++] = token;
-	token = strtok(NULL, " \t\n");
-	}
-	argv[argc] = NULL;
-
+	argc = tokenize_input(line, argv);
 	if (argc == 0)
-	return (0);
+		return (0);
+
+	cmd_path = resolve_command_path(argv, prog_name);
+	if (!cmd_path)
+		return (0);
 
 	pid = fork();
 	if (pid == 0)
 	{
-	if (execve(argv[0], argv, environ) == -1)
-	{
-	fprintf(stderr, "%s: No such file or directory\n", prog_name);
-	exit(127);
-	}
+		execve(cmd_path, argv, environ);
+		perror(prog_name);
+		exit(1);
 	}
 	else
-	wait(NULL);
+	{
+		wait(NULL);
+	}
+
+	if (cmd_path != argv[0])
+		free(cmd_path);
 
 	return (0);
+}
+/**
+ * find_path - search for a command in PATH
+ * @command: command name
+ *
+ * Return: full path (malloc'ed) or NULL
+ */
+char *find_path(char *command)
+{
+	char *path = getenv("PATH");
+	char *path_copy, *dir, full_path[1024];
+
+	if (!path)
+		return (NULL);
+
+	path_copy = strdup(path);
+	if (!path_copy)
+		return (NULL);
+
+	dir = strtok(path_copy, ":");
+	while (dir)
+	{
+		snprintf(full_path, sizeof(full_path), "%s/%s", dir, command);
+
+		if (access(full_path, X_OK) == 0)
+		{
+			free(path_copy);
+			return (strdup(full_path));
+		}
+
+		dir = strtok(NULL, ":");
+	}
+
+	free(path_copy);
+	return (NULL);
 }

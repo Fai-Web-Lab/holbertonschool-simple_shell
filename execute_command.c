@@ -119,3 +119,22 @@ char *find_path(char *command)
 	free(path_copy);
 	return (NULL);
 }
+/**
+ * get_env_value - get value of an environment variable
+ * @name: variable name (e.g. "PATH")
+ *
+ * Return: pointer to value or NULL
+ */
+char *get_env_value(char *name)
+{
+	int i = 0;
+	size_t len = strlen(name);
+
+	while (environ[i])
+	{
+		if (strncmp(environ[i], name, len) == 0 && environ[i][len] == '=')
+			return (environ[i] + len + 1);
+		i++;
+	}
+	return (NULL);
+}

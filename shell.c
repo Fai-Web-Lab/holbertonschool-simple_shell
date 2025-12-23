@@ -9,6 +9,7 @@ void run_shell(char *prog_name)
 	char *lineptr = NULL;
 	size_t n = 0;
 	ssize_t nread;
+	int cmd_count;
 
 	while (1)
 	{
@@ -20,7 +21,10 @@ void run_shell(char *prog_name)
 			break;
 
 		if (nread > 1 && !is_only_spaces(lineptr))
-			execute_command(lineptr, prog_name);
+		{
+			cmd_count++;
+			execute_command(lineptr, prog_name, cmd_count);
+		}
 	}
 
 	free(lineptr);

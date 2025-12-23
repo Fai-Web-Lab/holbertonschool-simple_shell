@@ -26,10 +26,11 @@ int tokenize_input(char *line, char **argv)
  * resolve_command_path - find full path of a command
  * @argv: argument vector
  * @prog_name: program name
+ * @cmd_count: command counter for error messages
  *
  * Return: pointer to path or NULL
  */
-char *resolve_command_path(char **argv, char *prog_name)
+char *resolve_command_path(char **argv, char *prog_name, int cmd_count)
 {
 	char *cmd_path;
 
@@ -39,7 +40,7 @@ char *resolve_command_path(char **argv, char *prog_name)
 	cmd_path = find_path(argv[0]);
 	if (!cmd_path)
 	{
-		fprintf(stderr, "%s: %s: not found\n", prog_name, argv[0]);
+		fprintf(stderr, "%s: %d: %s: not found\n", prog_name, cmd_count, argv[0]);
 		return (NULL);
 	}
 
@@ -49,10 +50,11 @@ char *resolve_command_path(char **argv, char *prog_name)
  * execute_command - executes a command with arguments
  * @line: input line
  * @prog_name: program name
+ * @cmd_count: command counter for error messages
  *
- * Return: 0
+ * Return: status code
  */
-int execute_command(char *line, char *prog_name)
+int execute_command(char *line, char *prog_name, int cmd_count)
 {
 	pid_t pid;
 	char *argv[BUFFER_SIZE];
@@ -63,9 +65,9 @@ int execute_command(char *line, char *prog_name)
 	if (argc == 0)
 		return (0);
 
-	cmd_path = resolve_command_path(argv, prog_name);
+	cmd_path = resolve_command_path(argv, prog_name, cmd_count);
 	if (!cmd_path)
-		return (0);
+		return (127);
 
 	pid = fork();
 	if (pid == 0)

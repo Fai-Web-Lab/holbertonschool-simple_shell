@@ -40,47 +40,54 @@ void free_tokens(char **tokens)
 }
 
 /**
-	* execute_command - execute a command
-	* @ctx: shell context
-	* @line: input line
-	*/
-void execute_command(shell_ctx_t *ctx, char *line)
+ * execute_command - execute a command
+ * @ctx: shell context
+ * @line: input line
+*/
+void execute_command (shell_ctx_t *ctx, char *line)
 {
 	char **args;
-	char *cmd_path;
-	pid_t pid;
+	pid_t pid = -1;
 	int status;
+	char *cmd_path;
+
+	(void)ctx;
 
 	args = split_line(line);
-	if (!args || !args[0])
+	if (args == NULL || args[0] == NULL)
 	{
-	free_tokens(args);
-	return;
+		free_tokens(args);
+		return;
 	}
-
+	if (strcmp(args[0], "exit") == 0)
+	{
+		free_tokens(args);
+		exit(0);
+	}
 	cmd_path = find_command(args[0], ctx);
-	if (!cmd_path)
+	if (cmd_path == NULL)
 	{
-	fprintf(stderr, "./hsh: 1: %s: not found\n", args[0]);
-	ctx->last_status = 127;
-	free_tokens(args);
-	return;
+		fprintf(stderr, "simple_shell: command not found: %s\n", args[0]);
+		free_tokens(args);
+		return;
 	}
-
+	
 	pid = fork();
 	if (pid == 0)
 	{
-	execve(cmd_path, args, ctx->env);
-	perror("execve");
-	exit(126);
+		if (execvp(args[0], args) == -1)
+		{
+			perror("simple_shell");
+		}
+		exit(EXIT_FAILURE);
+	}
+	else if (pid < 0)
+	{
+		perror("fork");
 	}
 	else
 	{
-	wait(&status);
-	if (WIFEXITED(status))
-	ctx->last_status = WEXITSTATUS(status);
+		waitpid(pid, &status, WUNTRACED);
 	}
-
-	free(cmd_path);
 	free_tokens(args);
 }

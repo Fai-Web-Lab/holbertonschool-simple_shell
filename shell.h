@@ -12,7 +12,7 @@
 
 extern char **environ;
 
-void run_shell(char *prog_name);
+int run_shell(char *prog_name);
 int execute_command(char *line, char *prog_name, int cmd_count);
 char *resolve_command_path(char **argv, char *prog_name, int cmd_count);
 int is_only_spaces(char *str);

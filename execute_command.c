@@ -59,32 +59,39 @@ int execute_command(char *line, char *prog_name, int cmd_count)
 	pid_t pid;
 	char *argv[BUFFER_SIZE];
 	char *cmd_path;
-	int argc;
+	int argc, status;
 
 	argc = tokenize_input(line, argv);
 	if (argc == 0)
+	{
 		return (0);
-
-	cmd_path = resolve_command_path(argv, prog_name, cmd_count);
-	if (!cmd_path)
-		return (127);
-
-	pid = fork();
-	if (pid == 0)
-	{
-		execve(cmd_path, argv, environ);
-		perror(prog_name);
-		exit(1);
 	}
-	else
-	{
-		wait(NULL);
-	}
+		if (strcmp(argv[0], "exit") == 0)
+		{
+			exit(0);
+		}
+		cmd_path = resolve_command_path(argv, prog_name, cmd_count);
+		if (!cmd_path)
+			return (127);
 
-	if (cmd_path != argv[0])
-		free(cmd_path);
+		pid = fork();
+		if (pid == 0)
+		{
+			execve(cmd_path, argv, environ);
+			perror(prog_name);
+			exit(127);
+		}
+		else
+		{
+			wait(&status);
+			if (WIFEXITED(status))
+				return (WEXITSTATUS(status));
+		}
 
-	return (0);
+		if (cmd_path != argv[0])
+			free(cmd_path);
+
+		return (0);
 }
 /**
  * find_path - search for a command in PATH

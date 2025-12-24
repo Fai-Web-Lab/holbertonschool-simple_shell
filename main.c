@@ -1,31 +1,23 @@
 #include "shell.h"
 
 /**
- * main - entry point of the simple shell
- * @ac: argument count (unused)
- * @av: argument vector, used to get program name
+ * main - Entry point of the simple shell
+ * @ac: Argument count (unused)
+ * @av: Argument vector, used to get the program name
  *
  * Description:
- * Reads user input line-by-line, increments a command counter
- * for each executed command, and passes both the input and
- * counter to the command execution handler.
+ * Initializes the shell and starts its main execution loop.
+ * The exit status of the shell matches the status of the last
+ * executed command, ensuring proper behavior in non-interactive mode.
  *
- * Return: Always 0
+ * Return: Exit status of the last executed command
  */
-
 int main(int ac, char **av)
 {
-	char *line = NULL;
-	size_t len = 0;
-	int cmd_count = 0;
+	int status;
 
 	(void)ac;
 
-	while (getline(&line, &len, stdin) != -1)
-	{
-		cmd_count++;
-		execute_command(line, av[0], cmd_count);
-	}
-	free(line);
-	return (0);
+	status = run_shell(av[0]);
+	return (status);
 }

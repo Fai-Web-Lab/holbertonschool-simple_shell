@@ -1,15 +1,22 @@
 #include "shell.h"
 
 /**
- * run_shell - Main loop of the shell
- * @prog_name: name of the shell program
+ * run_shell - Executes the main loop of the simple shell
+ * @prog_name: Name of the shell program
+ *
+ * Description:
+ * Displays the prompt in interactive mode, reads user input,
+ * counts executed commands, and executes valid commands.
+ *
+ * Return: Exit status of the last executed command
  */
-void run_shell(char *prog_name)
+int run_shell(char *prog_name)
 {
 	char *lineptr = NULL;
 	size_t n = 0;
 	ssize_t nread;
-	int cmd_count;
+	int cmd_count = 0;
+	int status = 0;
 
 	while (1)
 	{
@@ -23,11 +30,12 @@ void run_shell(char *prog_name)
 		if (nread > 1 && !is_only_spaces(lineptr))
 		{
 			cmd_count++;
-			execute_command(lineptr, prog_name, cmd_count);
+			status = execute_command(lineptr, prog_name, cmd_count);
 		}
 	}
 
 	free(lineptr);
+	return (status);
 }
 /**
  * is_only_spaces - checks if a string contains only whitespace

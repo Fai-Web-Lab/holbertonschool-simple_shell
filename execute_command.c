@@ -61,7 +61,7 @@ void execute_command(shell_ctx_t *ctx, char *line)
 	cmd_path = find_command(args[0], ctx);
 	if (!cmd_path)
 	{
-	fprintf(stderr, "%s: not found\n", args[0]);
+	fprintf(stderr, "%s: 1: %s: not found\n", "hsh", args[0]);
 	ctx->last_status = 127;
 	free_tokens(args);
 	return;

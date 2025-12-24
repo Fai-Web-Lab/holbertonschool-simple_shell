@@ -1,43 +1,38 @@
 #include "shell.h"
 
 /**
-	* find_command - Find the full path of a command using PATH
-	* @cmd: Command name
-	*
-	* Return: full path string (malloc'd), or NULL if not found
+	* find_path - Locates a command in the PATH
+	* @command: The command to find
+	* Return: Full path to command if found, or NULL
 	*/
-char *find_command(char *cmd)
+char *find_path(char *command)
 {
-	char *path_env, *path_copy, *dir;
-	char *full_path;
-	int len;
+	char *path, *path_copy, *token, *full_path;
+	struct stat st;
+	int i;
 
-	path_env = getenv("PATH");
-	if (!path_env)
+	for (i = 0; command[i]; i++)
+	if (command[i] == '/')
+	return (stat(command, &st) == 0 ? strdup(command) : NULL);
+
+	path = getenv("PATH");
+	if (!path || strlen(path) == 0)
 	return (NULL);
 
-	path_copy = strdup(path_env);
-	if (!path_copy)
-	return (NULL);
-
-	dir = strtok(path_copy, ":");
-	while (dir)
+	path_copy = strdup(path);
+	token = strtok(path_copy, ":");
+	while (token)
 	{
-	len = snprintf(NULL, 0, "%s/%s", dir, cmd);
-	full_path = malloc(len + 1);
-	if (!full_path)
-	{
-	free(path_copy);
-	return (NULL);
-	}
-	sprintf(full_path, "%s/%s", dir, cmd);
-	if (access(full_path, X_OK) == 0)
+	full_path = malloc(strlen(token) + strlen(command) + 2);
+	sprintf(full_path, "%s/%s", token, command);
+
+	if (stat(full_path, &st) == 0)
 	{
 	free(path_copy);
 	return (full_path);
 	}
 	free(full_path);
-	dir = strtok(NULL, ":");
+	token = strtok(NULL, ":");
 	}
 	free(path_copy);
 	return (NULL);

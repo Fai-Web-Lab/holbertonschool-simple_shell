@@ -2,22 +2,18 @@
 #define SHELL_H
 
 #include <stdio.h>
-#include <unistd.h>
 #include <stdlib.h>
+#include <unistd.h>
 #include <string.h>
-#include <sys/types.h>
 #include <sys/wait.h>
-#include <errno.h>
+#include <sys/stat.h>
+#include <sys/types.h>
 
-#define BUFFER_SIZE 1024
-#define PROMPT_TEXT "$ "
-#define ERR_FOUND "not found\n"
+extern char **environ;
 
-void run_shell(char *prog_name);
-int execute_command(char *line);
-char *find_command(char *cmd);
-char **split_line(char *line);
-void free_argv(char **argv);
-int _strcmp(char *s1, char *s2);
+void execute_command(char **args);
+char *find_path(char *command);
+char **tokenize(char *line);
+void free_args(char **args);
 
 #endif

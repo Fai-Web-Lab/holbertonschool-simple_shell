@@ -1,28 +1,42 @@
 #include "shell.h"
 
 /**
-	* run_shell - Main loop of the shell
-	* @prog_name: program name (unused)
+	* tokenize - Splits a string into tokens
+	* @line: The string to split
+	* Return: Null-terminated array of strings
 	*/
-void run_shell(char *prog_name)
+char **tokenize(char *line)
 {
-	char *line = NULL;
-	size_t n = 0;
-	ssize_t nread;
+	char **tokens = malloc(64 * sizeof(char *));
+	char *token;
+	int i = 0;
 
-	(void)prog_name;
+	if (!tokens)
+	return (NULL);
 
-	while (1)
+	token = strtok(line, " \t\r\n\a");
+	while (token != NULL)
 	{
-	if (isatty(STDIN_FILENO))
-	printf("%s", PROMPT_TEXT);
-
-	nread = getline(&line, &n, stdin);
-	if (nread == -1)
-	break;
-
-	if (nread > 1)
-	execute_command(line);
+	tokens[i] = strdup(token);
+	i++;
+	token = strtok(NULL, " \t\r\n\a");
 	}
-	free(line);
+	tokens[i] = NULL;
+	return (tokens);
+}
+
+/**
+	* free_args - Frees the array of strings
+	* @args: Array to free
+	*/
+void free_args(char **args)
+{
+	int i;
+
+	if (!args)
+	return;
+
+	for (i = 0; args[i]; i++)
+	free(args[i]);
+	free(args);
 }

@@ -1,44 +1,43 @@
 #include "shell.h"
 
 /**
-	* get_command_path - finds command in PATH
-	* @command: command name
-	*
-	* Return: full path or NULL
+	* find_command - Find command in PATH
+	* @cmd: command to search
+	* Return: full path to command or NULL
 	*/
-char *get_command_path(char *command)
+char *find_command(char *cmd)
 {
-	char *path, *path_copy, *dir, *full_path;
+	char *path, *token, *full_path;
 	size_t len;
 
-	if (strchr(command, '/'))
-	return (access(command, X_OK) == 0 ? strdup(command) : NULL);
+	if (!cmd)
+	return (NULL);
 
 	path = getenv("PATH");
 	if (!path)
 	return (NULL);
 
-	path_copy = strdup(path);
-	if (!path_copy)
-	return (NULL);
-
-	dir = strtok(path_copy, ":");
-	while (dir)
+	path = strdup(path);
+	token = strtok(path, ":");
+	while (token != NULL)
 	{
-	len = strlen(dir) + strlen(command) + 2;
+	len = strlen(token) + strlen(cmd) + 2;
 	full_path = malloc(len);
 	if (!full_path)
-	break;
+	exit(EXIT_FAILURE);
 
-	sprintf(full_path, "%s/%s", dir, command);
+	snprintf(full_path, len, "%s/%s", token, cmd);
+
 	if (access(full_path, X_OK) == 0)
 	{
-	free(path_copy);
+	free(path);
 	return (full_path);
 	}
+
 	free(full_path);
-	dir = strtok(NULL, ":");
+	token = strtok(NULL, ":");
 	}
-	free(path_copy);
+
+	free(path);
 	return (NULL);
 }

@@ -32,7 +32,7 @@ char **split_line(char *line)
 
 /**
 	* free_tokens - free tokens array
-	* @tokens: tokens
+	* @tokens: array of tokens
 	*/
 void free_tokens(char **tokens)
 {

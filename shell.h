@@ -21,5 +21,6 @@ void execute_command(shell_ctx_t *ctx, char *line);
 char *find_command(char *cmd, shell_ctx_t *ctx);
 char **split_line(char *line);
 void free_tokens(char **tokens);
+void free_ctx(shell_ctx_t *ctx);
 
 #endif

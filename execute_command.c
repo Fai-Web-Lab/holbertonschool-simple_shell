@@ -69,6 +69,7 @@ void execute_command (shell_ctx_t *ctx, char *line)
 	{
 		fprintf(stderr, "simple_shell: command not found: %s\n", args[0]);
 		free_tokens(args);
+		free_ctx(ctx);
 		return;
 	}
 	

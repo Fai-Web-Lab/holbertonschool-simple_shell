@@ -1,23 +1,16 @@
 #include "shell.h"
 
 /**
- * main - Entry point of the simple shell
- * @ac: Argument count (unused)
- * @av: Argument vector, used to get the program name
- *
- * Description:
- * Initializes the shell and starts its main execution loop.
- * The exit status of the shell matches the status of the last
- * executed command, ensuring proper behavior in non-interactive mode.
- *
- * Return: Exit status of the last executed command
- */
-int main(int ac, char **av)
+	* main - Entry point
+	* @argc: argument count
+	* @argv: argument vector
+	*
+	* Return: 0
+	*/
+int main(int argc, char **argv)
 {
-	int status;
+	(void)argc;
 
-	(void)ac;
-
-	status = run_shell(av[0]);
-	return (status);
+	run_shell(argv[0]);
+	return (0);
 }

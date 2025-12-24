@@ -2,21 +2,17 @@
 #define SHELL_H
 
 #include <stdio.h>
-#include <unistd.h>
 #include <stdlib.h>
+#include <unistd.h>
 #include <string.h>
 #include <sys/wait.h>
 
-#define BUFFER_SIZE 102
-#define PROMPT "$ "
+#define BUFFER_SIZE 1024
+
+void run_shell(char *name);
+int execute_command(char *line, char *name);
+char *get_command_path(char *command);
 
 extern char **environ;
-
-int run_shell(char *prog_name);
-int execute_command(char *line, char *prog_name, int cmd_count);
-char *resolve_command_path(char **argv, char *prog_name, int cmd_count);
-int is_only_spaces(char *str);
-char *find_path(char *command);
-char *get_env_value(char *name);
 
 #endif

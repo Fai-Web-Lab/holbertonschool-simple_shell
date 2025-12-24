@@ -1,19 +1,25 @@
 #ifndef SHELL_H
 #define SHELL_H
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <string.h>
-#include <sys/wait.h>
-#include <sys/stat.h>
 #include <sys/types.h>
+
+/**
+	* struct shell_ctx - shell context
+	* @last_status: last command exit status
+	* @env: environment variables
+	*/
+typedef struct shell_ctx
+{
+	int last_status;
+	char **env;
+} shell_ctx_t;
 
 extern char **environ;
 
-void execute_command(char **args);
-char *find_path(char *command);
-char **tokenize(char *line);
-void free_args(char **args);
+void shell_loop(shell_ctx_t *ctx);
+void execute_command(shell_ctx_t *ctx, char *line);
+char *find_command(char *cmd, shell_ctx_t *ctx);
+char **split_line(char *line);
+void free_tokens(char **tokens);
 
 #endif

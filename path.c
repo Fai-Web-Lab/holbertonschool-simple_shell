@@ -1,39 +1,72 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/stat.h>
 #include "shell.h"
 
 /**
-	* find_path - Locates a command in the PATH
-	* @command: The command to find
-	* Return: Full path to command if found, or NULL
+	* search_in_path - search command in PATH
+	* @cmd: command name
+	* @path: PATH value
+	*
+	* Return: full path or NULL
 	*/
-char *find_path(char *command)
+static char *search_in_path(char *cmd, char *path)
 {
-	char *path, *path_copy, *token, *full_path;
+	char *copy, *token, *full;
 	struct stat st;
-	int i;
 
-	for (i = 0; command[i]; i++)
-	if (command[i] == '/')
-	return (stat(command, &st) == 0 ? strdup(command) : NULL);
-
-	path = getenv("PATH");
-	if (!path || strlen(path) == 0)
+	copy = strdup(path);
+	if (!copy)
 	return (NULL);
 
-	path_copy = strdup(path);
-	token = strtok(path_copy, ":");
+	token = strtok(copy, ":");
 	while (token)
 	{
-	full_path = malloc(strlen(token) + strlen(command) + 2);
-	sprintf(full_path, "%s/%s", token, command);
+	full = malloc(strlen(token) + strlen(cmd) + 2);
+	if (!full)
+	break;
 
-	if (stat(full_path, &st) == 0)
+	sprintf(full, "%s/%s", token, cmd);
+	if (stat(full, &st) == 0)
 	{
-	free(path_copy);
-	return (full_path);
+	free(copy);
+	return (full);
 	}
-	free(full_path);
+	free(full);
 	token = strtok(NULL, ":");
 	}
-	free(path_copy);
+	free(copy);
 	return (NULL);
+}
+
+/**
+	* find_command - find executable using PATH
+	* @cmd: command name
+	* @ctx: shell context
+	*
+	* Return: full path or NULL
+	*/
+char *find_command(char *cmd, shell_ctx_t *ctx)
+{
+	struct stat st;
+	char *path;
+
+	(void)ctx;
+
+	if (!cmd)
+	return (NULL);
+
+	if (cmd[0] == '/' || cmd[0] == '.')
+	{
+	if (stat(cmd, &st) == 0)
+	return (strdup(cmd));
+	return (NULL);
+	}
+
+	path = getenv("PATH");
+	if (!path || path[0] == '\0')
+	return (NULL);
+
+	return (search_in_path(cmd, path));
 }

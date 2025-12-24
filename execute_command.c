@@ -1,42 +1,86 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+#include <sys/wait.h>
 #include "shell.h"
 
 /**
-	* execute_command - Forks and executes a command
-	* @args: Array of strings containing command and arguments
+	* split_line - split input line into tokens
+	* @line: input string
+	*
+	* Return: array of tokens
 	*/
-void execute_command(char **args)
+char **split_line(char *line)
 {
-	pid_t child_pid;
+	char **tokens = malloc(sizeof(char *) * 64);
+	char *token;
+	int i = 0;
+
+	if (!tokens)
+	return (NULL);
+
+	token = strtok(line, " \t\n");
+	while (token)
+	{
+	tokens[i++] = token;
+	token = strtok(NULL, " \t\n");
+	}
+	tokens[i] = NULL;
+	return (tokens);
+}
+
+/**
+	* free_tokens - free tokens array
+	* @tokens: tokens
+	*/
+void free_tokens(char **tokens)
+{
+	free(tokens);
+}
+
+/**
+	* execute_command - execute a command
+	* @ctx: shell context
+	* @line: input line
+	*/
+void execute_command(shell_ctx_t *ctx, char *line)
+{
+	char **args;
+	char *cmd_path;
+	pid_t pid;
 	int status;
-	char *actual_path;
 
-	actual_path = find_path(args[0]);
-
-	if (actual_path == NULL)
+	args = split_line(line);
+	if (!args || !args[0])
 	{
-	perror("./shell");
+	free_tokens(args);
 	return;
 	}
 
-	child_pid = fork();
-	if (child_pid == -1)
+	cmd_path = find_command(args[0], ctx);
+	if (!cmd_path)
 	{
-	perror("Error:");
-	free(actual_path);
+	fprintf(stderr, "%s: not found\n", args[0]);
+	ctx->last_status = 127;
+	free_tokens(args);
 	return;
 	}
 
-	if (child_pid == 0)
+	pid = fork();
+	if (pid == 0)
 	{
-	if (execve(actual_path, args, environ) == -1)
-	{
-	perror("Error:");
-	exit(1);
-	}
+	execve(cmd_path, args, ctx->env);
+	perror("execve");
+	exit(126);
 	}
 	else
 	{
 	wait(&status);
-	free(actual_path);
+	if (WIFEXITED(status))
+	ctx->last_status = WEXITSTATUS(status);
 	}
+
+	free(cmd_path);
+	free_tokens(args);
 }

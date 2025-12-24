@@ -1,37 +1,18 @@
+#include <unistd.h>
 #include "shell.h"
 
 /**
-	* main - Entry point for the simple shell
-	* Return: 0 on success
+	* main - entry point of shell
+	*
+	* Return: Always 0
 	*/
 int main(void)
 {
-	char *line = NULL;
-	size_t len = 0;
-	ssize_t nread;
-	char **args;
+	shell_ctx_t ctx;
 
-	while (1)
-	{
-	if (isatty(STDIN_FILENO))
-	write(STDOUT_FILENO, ":) ", 3);
+	ctx.last_status = 0;
+	ctx.env = environ;
 
-	nread = getline(&line, &len, stdin);
-	if (nread == -1)
-	{
-	free(line);
-	exit(0);
-	}
-
-	if (line[nread - 1] == '\n')
-	line[nread - 1] = '\0';
-
-	args = tokenize(line);
-	if (args && args[0])
-	execute_command(args);
-
-	free_args(args);
-	}
-	free(line);
+	shell_loop(&ctx);
 	return (0);
 }

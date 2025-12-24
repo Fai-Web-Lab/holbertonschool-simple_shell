@@ -1,91 +1,114 @@
 #include "shell.h"
 
 /**
-	* execute_builtin - handle built-in commands
-	* @argv: array of tokens
-	* Return: 1 if builtin executed, 0 otherwise
+	* _strcmp - Compare two strings
+	* @s1: first string
+	* @s2: second string
+	*
+	* Return: 0 if equal, else non-zero
 	*/
-int execute_builtin(char **argv)
-{
-	if (_strcmp(argv[0], "exit") == 0)
-	{
-	exit(0);
-	}
-	else if (_strcmp(argv[0], "env") == 0)
-	{
-	int i = 0;
 
-	while (environ[i])
+extern char **environ;
+
+int _strcmp(char *s1, char *s2)
+{
+	while (*s1 && (*s1 == *s2))
 	{
-	printf("%s\n", environ[i]);
-	i++;
+	s1++;
+	s2++;
 	}
-	return (1);
-	}
-	return (0);
+	return (*s1 - *s2);
 }
 
 /**
-	* run_external_command - Execute non-builtin command
-	* @argv: array of tokens
-	* Return: 0 on success
+	* split_line - Tokenize input line into argv array
+	* @line: input line
+	*
+	* Return: array of tokens (NULL terminated)
 	*/
-int run_external_command(char **argv)
+char **split_line(char *line)
 {
+	char **argv = NULL;
+	char *token;
+	int argc = 0;
+
+	token = strtok(line, " \t\n");
+	while (token)
+	{
+	argv = realloc(argv, sizeof(char *) * (argc + 2));
+	if (!argv)
+	return (NULL);
+	argv[argc] = strdup(token);
+	if (!argv[argc])
+	return (NULL);
+	argc++;
+	token = strtok(NULL, " \t\n");
+	}
+	if (argv)
+	argv[argc] = NULL;
+	return (argv);
+}
+
+/**
+	* free_argv - Free argv array
+	* @argv: array to free
+	*/
+void free_argv(char **argv)
+{
+	int i = 0;
+
+	if (!argv)
+	return;
+
+	while (argv[i])
+	{
+	free(argv[i]);
+	i++;
+	}
+	free(argv);
+}
+
+/**
+	* execute_command - Execute a command line
+	* @line: input line
+	*
+	* Return: 0
+	*/
+int execute_command(char *line)
+{
+	char **argv;
+	char *full_path;
 	pid_t pid;
 	int status;
-	char *full_path;
 
+	argv = split_line(line);
 	if (!argv || !argv[0])
-	return (-1);
+	{
+	free_argv(argv);
+	return (0);
+	}
 
 	full_path = find_command(argv[0]);
-	if (full_path == NULL)
+	if (!full_path)
 	{
-	fprintf(stderr, "%s%s", argv[0], ERR_FOUND);
-	return (-1);
+	fprintf(stderr, "%s: %s", argv[0], ERR_FOUND);
+	free_argv(argv);
+	return (0);
 	}
 
 	pid = fork();
 	if (pid == 0)
 	{
 	if (execve(full_path, argv, environ) == -1)
-	{
-	fprintf(stderr, "%s%s", argv[0], ERR_FOUND);
+	perror("execve");
 	exit(EXIT_FAILURE);
 	}
-	}
-	else if (pid > 0)
-	{
+	else if (pid < 0)
+	perror("fork");
+	else
 	waitpid(pid, &status, 0);
-	}
+
 	free(full_path);
-	return (0);
-}
-
-/**
-	* execute_command - Process a line
-	* @line: input line
-	* @prog_name: shell name
-	* @line_number: line number
-	* Return: 0
-	*/
-int execute_command(char *line, char *prog_name, int line_number)
-{
-	(void)prog_name;
-	(void)line_number;
-	char **argv;
-
-	argv = split_line(line);
-	if (!argv || !argv[0])
-	{
-	free_argv(argv);
-	return (-1);
-	}
-
-	if (!execute_builtin(argv))
-	run_external_command(argv);
-
 	free_argv(argv);
 	return (0);
 }

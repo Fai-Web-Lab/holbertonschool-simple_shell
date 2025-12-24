@@ -19,6 +19,7 @@ void shell_loop(shell_ctx_t *ctx)
 	write(STDOUT_FILENO, ":) ", 3);
 
 	read = getline(&line, &len, stdin);
+
 	if (read == -1)
 	{
 	free(line);

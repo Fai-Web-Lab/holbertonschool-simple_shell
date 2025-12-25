@@ -33,11 +33,11 @@ void shell_loop(shell_ctx_t *ctx)
 	}
 }
 /**
- * free_ctx - free memory allocated in shell context
- * @ctx: shell context
- */
+	* free_ctx - free memory allocated in shell context
+	* @ctx: shell context
+	*/
 void free_ctx(shell_ctx_t *ctx)
 {
-    if (!ctx)
-        return;
+	if (!ctx)
+	return;
 }

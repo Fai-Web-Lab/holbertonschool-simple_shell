@@ -44,7 +44,7 @@ char **split_line(char *line)
 	*   (because they point into the original line buffer).
 	*/
 void free_tokens(char **tokens)
-	{
+{
 	if (tokens)
 	free(tokens);
 }
@@ -65,13 +65,15 @@ int handle_builtin(shell_ctx_t *ctx, char **args)
 {
 	if (strcmp(args[0], "exit") == 0)
 	{
+	if (isatty(STDIN_FILENO))
+	write(STDOUT_FILENO, "OK\n", 3);
+
 	free_tokens(args);
 	free_ctx(ctx);
-	exit(0);
+	exit(ctx->last_status);
 	}
 	return (0);
 }
-
 /**
 	* execute_command - executes a command entered by the user
 	* @ctx: shell context (environment, resources)

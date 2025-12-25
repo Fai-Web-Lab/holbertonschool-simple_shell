@@ -40,4 +40,6 @@ void free_ctx(shell_ctx_t *ctx)
 {
 	if (!ctx)
 	return;
+
+	free(ctx);
 }

@@ -23,6 +23,7 @@ void shell_loop(shell_ctx_t *ctx)
 	if (read == -1)
 	{
 	free(line);
+	free_ctx(ctx);
 	exit(ctx->last_status);
 	}
 

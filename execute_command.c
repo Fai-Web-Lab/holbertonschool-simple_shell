@@ -69,9 +69,9 @@ int handle_builtin(shell_ctx_t *ctx, char **args)
 	write(STDOUT_FILENO, "OK\n", 3);
 
 	free_tokens(args);
-	free_ctx(ctx);
 	exit(ctx->last_status);
 	}
+
 	return (0);
 }
 /**
@@ -98,10 +98,11 @@ void execute_command(shell_ctx_t *ctx, char *line)
 	free_tokens(args);
 	return;
 	}
-
+	{
 	if (handle_builtin(ctx, args))
-	return;
-
+	free_tokens(args);
+		return;
+	}
 	cmd_path = find_command(args[0], ctx);
 	if (!cmd_path)
 	{

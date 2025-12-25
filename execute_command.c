@@ -65,7 +65,6 @@ int handle_builtin(shell_ctx_t *ctx, char **args)
 {
 	if (strcmp(args[0], "exit") == 0)
 	{
-	puts("OK\n");
 	free_tokens(args);
 	free_ctx(ctx);
 	exit(0);

@@ -40,21 +40,25 @@ void free_tokens(char **tokens)
 }
 
 /**
- * execute_command - execute a command
- * @ctx: shell context
- * @line: input line
-*/
-void execute_command (shell_ctx_t *ctx, char *line)
+ * execute_command - executes a command entered by the user
+ * @ctx: shell context (environment, resources)
+ * @line: input line containing the command
+ *
+ * Description:
+ * - Splits the input line into arguments
+ * - Handles the built-in "exit" command
+ * - Searches for the command path
+ * - Forks and executes the command in a child process
+ * - Cleans up allocated memory properly
+ */
+void execute_command(shell_ctx_t *ctx, char *line)
 {
-	char **args;
-	pid_t pid = -1;
+	char **args = split_line(line);
+	pid_t pid;
 	int status;
 	char *cmd_path;
 
-	(void)ctx;
-
-	args = split_line(line);
-	if (args == NULL || args[0] == NULL)
+	if (!args || !args[0])
 	{
 		free_tokens(args);
 		return;
@@ -62,33 +66,24 @@ void execute_command (shell_ctx_t *ctx, char *line)
 	if (strcmp(args[0], "exit") == 0)
 	{
 		free_tokens(args);
+		free_ctx(ctx);
 		exit(0);
 	}
+
 	cmd_path = find_command(args[0], ctx);
-	if (cmd_path == NULL)
+	if (!cmd_path)
 	{
 		fprintf(stderr, "simple_shell: command not found: %s\n", args[0]);
-		free_tokens(args);
-		free_ctx(ctx);
+		(free_tokens(args));
 		return;
 	}
-	
+
 	pid = fork();
 	if (pid == 0)
-	{
-		if (execvp(args[0], args) == -1)
-		{
-			perror("simple_shell");
-		}
-		exit(EXIT_FAILURE);
-	}
-	else if (pid < 0)
-	{
-		perror("fork");
-	}
-	else
-	{
-		waitpid(pid, &status, WUNTRACED);
-	}
+		execve(cmd_path, args, ctx->env), perror("simple_shell"), exit(1);
+	else if (pid > 0)
+		waitpid(pid, &status, 0);
+
+	free(cmd_path);
 	free_tokens(args);
 }

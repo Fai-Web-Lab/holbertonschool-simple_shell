@@ -38,14 +38,6 @@ void shell_loop(shell_ctx_t *ctx)
  */
 void free_ctx(shell_ctx_t *ctx)
 {
-	int i;
-	if (!ctx)
-		return;
-
-	if (ctx->env)
-	{
-		for (i = 0; ctx->env[i]; i++)
-			free(ctx->env[i]);
-		free(ctx->env);
-	}
+    if (!ctx)
+        return;
 }

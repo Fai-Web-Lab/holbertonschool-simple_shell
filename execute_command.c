@@ -101,7 +101,7 @@ void execute_command(shell_ctx_t *ctx, char *line)
 	{
 	if (handle_builtin(ctx, args))
 	free_tokens(args);
-		return;
+	return;
 	}
 	cmd_path = find_command(args[0], ctx);
 	if (!cmd_path)

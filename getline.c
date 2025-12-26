@@ -1,84 +1,89 @@
 #include "getline.h"
-
-#define READ_SIZE 1024
-
-/**
-	* resize_buffer - resizes line buffer if needed
-	* @lineptr: buffer pointer
-	* @n: buffer size
-	* @i: current index
-	*
-	* Return: 0 on success, -1 on failure
-	*/
-static int resize_buffer(char **lineptr, size_t *n, ssize_t i)
-{
-	char *new_line;
-
-	if (i + 1 < (ssize_t)*n)
-	return (0);
-
-	*n *= 2;
-	new_line = realloc(*lineptr, *n);
-	if (!new_line)
-	return (-1);
-
-	*lineptr = new_line;
-	return (0);
-}
+#include <string.h>
+#include <stddef.h>
 
 /**
-	* refill_buffer - refills static buffer using read
-	* @buffer: static buffer
-	* @buf_len: buffer length
-	* @buf_pos: buffer position
-	*
+	* _read_buffer - fills the static buffer
+	* @buf: static buffer
+	* @buf_len: pointer to current buffer length
 	* Return: number of bytes read
 	*/
-static ssize_t refill_buffer(char *buffer, ssize_t *buf_len, ssize_t *buf_pos)
+static ssize_t _read_buffer(char *buf, size_t *buf_len)
 {
-	*buf_len = read(STDIN_FILENO, buffer, READ_SIZE);
-	*buf_pos = 0;
+	*buf_len = read(STDIN_FILENO, buf, READ_BUF_SIZE);
 	return (*buf_len);
 }
 
 /**
-	* _getline - reads a line from stdin
-	* @lineptr: pointer to buffer
-	* @n: buffer size
-	*
-	* Return: number of characters read, -1 on EOF
+	* _append_chunk - appends chunk to line
+	* @line: current line
+	* @line_len: current line length
+	* @chunk: chunk to append
+	* @chunk_len: length of chunk
+	* Return: new line pointer (malloced)
 	*/
-ssize_t _getline(char **lineptr, size_t *n)
+static char *_append_chunk(char *line, size_t line_len,
+	char *chunk, size_t chunk_len)
 {
-	static char buffer[READ_SIZE];
-	static ssize_t buf_len, buf_pos;
-	ssize_t i = 0;
+	char *new_line = malloc(line_len + chunk_len + 1);
 
-	if (!lineptr || !n)
-	return (-1);
-
-	if (*lineptr == NULL || *n == 0)
+if (!new_line)
 	{
-	*n = READ_SIZE;
-	*lineptr = malloc(*n);
-	if (!*lineptr)
-	return (-1);
+	if (line)
+	free(line);
+	return (NULL);
 	}
+
+	if (line)
+	{
+	memcpy(new_line, line, line_len);
+	free(line);
+	}
+
+	memcpy(new_line + line_len, chunk, chunk_len);
+	new_line[line_len + chunk_len] = '\0';
+	return (new_line);
+}
+
+/**
+	* _getline - reads a line from stdin
+	* Return: pointer to line (must be freed by caller)
+	*/
+char *_getline(void)
+{
+	static char buf[READ_BUF_SIZE];
+	static size_t buf_pos;
+	static size_t buf_len;
+	char *line = NULL;
+	size_t line_len = 0;
+	ssize_t i;
 
 	while (1)
 	{
-	if (buf_pos >= buf_len &&
-	refill_buffer(buffer, &buf_len, &buf_pos) <= 0)
-	return (i > 0 ? i : -1);
-
-	if (resize_buffer(lineptr, n, i) == -1)
-	return (-1);
-
-	(*lineptr)[i] = buffer[buf_pos++];
-	if ((*lineptr)[i++] == '\n')
+	if (buf_pos >= buf_len)
 	{
-	(*lineptr)[i] = '\0';
-	return (i);
+	if (_read_buffer(buf, &buf_len) <= 0)
+	return (NULL);
+	buf_pos = 0;
 	}
+
+	for (i = buf_pos; i < buf_len; i++)
+	{
+	if (buf[i] == '\n')
+	{
+	line = _append_chunk(line, line_len, buf + buf_pos, i - buf_pos);
+	if (!line)
+	return (NULL);
+	line_len += i - buf_pos;
+	buf_pos = i + 1;
+	return (line);
+	}
+	}
+
+	line = _append_chunk(line, line_len, buf + buf_pos, buf_len - buf_pos);
+	if (!line)
+	return (NULL);
+	line_len += buf_len - buf_pos;
+	buf_pos = buf_len;
 	}
 }

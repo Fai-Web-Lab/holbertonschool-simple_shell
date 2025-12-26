@@ -46,8 +46,8 @@ if (!new_line)
 }
 
 /**
-	* _getline - reads a line from stdin
-	* Return: pointer to line (must be freed by caller)
+	* _getline - reads a line from stdin using a static buffer
+	* Return: pointer to the line (must be freed by caller)
 	*/
 char *_getline(void)
 {
@@ -56,7 +56,7 @@ char *_getline(void)
 	static size_t buf_len;
 	char *line = NULL;
 	size_t line_len = 0;
-	ssize_t i;
+	size_t i;
 
 	while (1)
 	{

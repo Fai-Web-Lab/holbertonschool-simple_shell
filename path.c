@@ -4,6 +4,28 @@
 #include "shell.h"
 
 /**
+	* get_path_value - extracts PATH value from environ
+	*
+	* Return: malloc'd string containing PATH value or NULL
+	*/
+static char *get_path_value(void)
+{
+	int i = 0;
+	char *p;
+
+	while (environ[i])
+	{
+	if (strncmp(environ[i], "PATH=", 5) == 0)
+	{
+	p = strdup(environ[i] + 5);
+	return (p);
+	}
+	i++;
+	}
+	return (NULL);
+}
+
+/**
 	* build_path - builds full path string "dir/cmd"
 	* @dir: directory from PATH
 	* @cmd: command name
@@ -25,33 +47,28 @@ static char *build_path(char *dir, char *cmd)
 
 	return (full);
 }
-
 /**
 	* find_command - searches PATH for an executable command
 	* @cmd: command name
 	* @ctx: shell context (unused)
 	*
-	* Description:
-	* - Handles absolute/relative paths.
-	* - Iterates through PATH directories.
-	* - Builds full paths and checks X_OK.
-	* - Returns malloc'd string or NULL.
-	*
 	* Return: full path or NULL
 	*/
 char *find_command(char *cmd, shell_ctx_t *ctx)
 {
-	char *path = getenv("PATH"), *copy, *dir, *full;
+	char *path, *copy, *dir, *full;
 
 	(void)ctx;
 
 	if (cmd[0] == '/' || cmd[0] == '.')
 	return (access(cmd, X_OK) == 0 ? strdup(cmd) : NULL);
 
+	path = get_path_value();
 	if (!path)
 	return (NULL);
 
 	copy = strdup(path);
+	free(path);
 	if (!copy)
 	return (NULL);
 

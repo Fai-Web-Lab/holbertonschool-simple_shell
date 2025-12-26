@@ -65,7 +65,6 @@ int handle_builtin(shell_ctx_t *ctx, char **args)
 {
 	if (strcmp(args[0], "exit") == 0)
 	{
-	if (isatty(STDIN_FILENO))
 	write(STDOUT_FILENO, "OK\n", 3);
 
 	free_tokens(args);

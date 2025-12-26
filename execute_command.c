@@ -1,89 +1,19 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 #include <unistd.h>
 #include <sys/wait.h>
 #include "shell.h"
 
 /**
-	* split_line - split input line into tokens
-	* @line: input string
-	*
-	* Return: array of tokens (NULL-terminated) or NULL on failure
-	*
-	* Description:
-	* - Uses strtok to split the input line by spaces, tabs, and newlines.
-	* - Allocates a fixed-size array of pointers (64).
-	* - Caller must free the array using free_tokens.
-	*/
-char **split_line(char *line)
-{
-	char **tokens = malloc(sizeof(char *) * 64);
-	char *token;
-	int i = 0;
-
-	if (!tokens)
-	return (NULL);
-
-	token = strtok(line, " \t\n");
-	while (token)
-	{
-	tokens[i++] = token;
-	token = strtok(NULL, " \t\n");
-	}
-	tokens[i] = NULL;
-	return (tokens);
-}
-
-/**
-	* free_tokens - free tokens array
-	* @tokens: array of tokens
-	*
-	* Description:
-	* - Frees only the array of pointers, not the strings themselves
-	*   (because they point into the original line buffer).
-	*/
-void free_tokens(char **tokens)
-{
-	if (tokens)
-	free(tokens);
-}
-
-/**
-	* handle_builtin - check and execute built-in commands
+	* execute_command - parses and executes a command
 	* @ctx: shell context
-	* @args: array of arguments
-	*
-	* Return: 1 if a built-in was executed, 0 otherwise
+	* @line: raw input line from getline
 	*
 	* Description:
-	* - Currently supports only "exit" built-in.
-	* - Prints "OK" before exiting as required by checker.
-	* - Frees allocated resources before terminating.
-	*/
-int handle_builtin(shell_ctx_t *ctx, char **args)
-{
-	if (strcmp(args[0], "exit") == 0)
-	{
-	write(STDOUT_FILENO, "OK\n", 3);
-
-	free_tokens(args);
-	exit(ctx->last_status);
-	}
-
-	return (0);
-}
-/**
-	* execute_command - executes a command entered by the user
-	* @ctx: shell context (environment, resources)
-	* @line: input line containing the command
-	*
-	* Description:
-	* - Splits the input line into arguments.
-	* - Handles built-in commands (currently only "exit").
-	* - Searches for the command path in PATH.
-	* - Forks and executes the command in a child process.
-	* - Cleans up allocated memory properly.
+	* - Splits line into tokens.
+	* - Checks for built-in commands.
+	* - Searches PATH for external commands.
+	* - Forks and executes using execve().
 	*/
 void execute_command(shell_ctx_t *ctx, char *line)
 {
@@ -97,11 +27,10 @@ void execute_command(shell_ctx_t *ctx, char *line)
 	free_tokens(args);
 	return;
 	}
-	{
+
 	if (handle_builtin(ctx, args))
-	free_tokens(args);
 	return;
-	}
+
 	cmd_path = find_command(args[0], ctx);
 	if (!cmd_path)
 	{
@@ -109,9 +38,8 @@ void execute_command(shell_ctx_t *ctx, char *line)
 	free_tokens(args);
 	return;
 	}
-
 	pid = fork();
-	if (pid == 0)
+if (pid == 0)
 	{
 	execve(cmd_path, args, ctx->env);
 	perror("simple_shell");

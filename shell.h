@@ -3,24 +3,24 @@
 
 #include <sys/types.h>
 #include <stddef.h>
+
 /**
-	* struct shell_ctx - shell context
-	* @last_status: last command exit status
+	* struct shell_ctx - holds shell state
 	* @env: environment variables
+	* @last_status: last command exit status
 	*/
 typedef struct shell_ctx
 {
-	int last_status;
 	char **env;
+	int last_status;
 } shell_ctx_t;
 
 extern char **environ;
 
-void shell_loop(shell_ctx_t *ctx);
-void execute_command(shell_ctx_t *ctx, char *line);
-char *find_command(char *cmd, shell_ctx_t *ctx);
 char **split_line(char *line);
 void free_tokens(char **tokens);
-void free_ctx(shell_ctx_t *ctx);
 int handle_builtin(shell_ctx_t *ctx, char **args);
+char *find_command(char *cmd, shell_ctx_t *ctx);
+void execute_command(shell_ctx_t *ctx, char *line);
+
 #endif

@@ -1,92 +1,57 @@
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <sys/stat.h>
+#include <unistd.h>
+#include <stdio.h>
 #include "shell.h"
 
 /**
-	* get_path - get the value of PATH from environment
-	* @env: environment variables
+	* find_command - searches PATH for an executable command
+	* @cmd: command name (e.g., "ls")
+	* @ctx: shell context (unused but kept for structure)
 	*
-	* Return: pointer to PATH string or NULL if not found
+	* Return: malloc'd full path string or NULL if not found
+	*
+	* Description:
+	* - If cmd starts with '/' or '.', treat it as direct path.
+	* - Otherwise search each directory in PATH.
+	* - Returns a malloc'd string that must be freed by caller.
 	*/
-char *get_path(char **env)
+char *find_command(char *cmd, shell_ctx_t *ctx)
 {
-	int i;
-	size_t len = 5;
+	char *path = getenv("PATH");
+	char *copy, *dir, *full;
+	int len;
 
-	for (i = 0; env[i]; i++)
+	(void)ctx;
+	if (cmd[0] == '/' || cmd[0] == '.')
 	{
-	if (strncmp(env[i], "PATH=", len) == 0)
-	return (env[i] + len);
-	}
+	if (access(cmd, X_OK) == 0)
+	return strdup(cmd);
 	return (NULL);
-}
+	}
 
-/**
-	* search_in_path - search command in a PATH string
-	* @cmd: command name
-	* @path: PATH value
-	*
-	* Return: full path string or NULL
-	*/
-static char *search_in_path(char *cmd, char *path)
-{
-	char *copy, *token, *full;
-	struct stat st;
+	if (!path)
+	return (NULL);
 
 	copy = strdup(path);
-	if (!copy)
-	return (NULL);
+	dir = strtok(copy, ":");
 
-	token = strtok(copy, ":");
-	while (token)
+	while (dir)
 	{
-	full = malloc(strlen(token) + strlen(cmd) + 2);
-	if (!full)
-	break;
+	len = strlen(dir) + strlen(cmd) + 2;
+	full = malloc(len);
+	snprintf(full, len, "%s/%s", dir, cmd);
 
-	sprintf(full, "%s/%s", token, cmd);
-	if (stat(full, &st) == 0)
+	if (access(full, X_OK) == 0)
 	{
 	free(copy);
 	return (full);
 	}
+
 	free(full);
-	token = strtok(NULL, ":");
+	dir = strtok(NULL, ":");
 	}
 
 	free(copy);
 	return (NULL);
-}
-
-/**
-	* find_command - find executable path of a command
-	* @cmd: command name
-	* @ctx: shell context
-	*
-	* Return: full path string or NULL if not found
-	*/
-char *find_command(char *cmd, shell_ctx_t *ctx)
-{
-	char *path;
-	struct stat st;
-
-	(void)ctx;
-
-	if (!cmd)
-	return (NULL);
-
-	if (cmd[0] == '/' || cmd[0] == '.')
-	{
-	if (stat(cmd, &st) == 0)
-	return (strdup(cmd));
-	return (NULL);
-	}
-
-	path = get_path(ctx->env);
-	if (!path || path[0] == '\0')
-	return (NULL);
-
-	return (search_in_path(cmd, path));
 }

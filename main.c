@@ -1,29 +1,44 @@
+#include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
 #include "shell.h"
 
 /**
-	* main - entry point of the shell
+	* main - entry point of the simple shell
 	* @ac: argument count (unused)
 	* @av: argument vector (unused)
 	* @env: environment variables
 	*
 	* Return: always 0
+	*
+	* Description:
+	* - Displays prompt only in interactive mode.
+	* - Reads input using getline.
+	* - Passes each line to execute_command().
 	*/
 int main(int ac, char **av, char **env)
 {
-	shell_ctx_t *ctx = malloc(sizeof(shell_ctx_t));
+	shell_ctx_t ctx;
+	char *line = NULL;
+	size_t len = 0;
 
 	(void)ac;
 	(void)av;
 
-	if (!ctx)
-	return (1);
+	ctx.env = env;
+	ctx.last_status = 0;
 
-	ctx->last_status = 0;
-	ctx->env = env;
+	while (1)
+	{
+	if (isatty(STDIN_FILENO))
+	write(STDERR_FILENO, ":) ", 3);
 
-	shell_loop(ctx);
-	free_ctx(ctx);
+	if (getline(&line, &len, stdin) == -1)
+	break;
 
+	execute_command(&ctx, line);
+}
+
+	free(line);
 	return (0);
 }

@@ -28,7 +28,7 @@ int main(int ac, char **av, char **env)
 	(void)av;
 
 	ctx.env = env;
-	ctx.last_status = 0;
+	ctx.exit_status = 0;
 	ctx.should_exit = 0;
 
 	while (1)
@@ -46,5 +46,5 @@ int main(int ac, char **av, char **env)
 	}
 
 	free(line);
-	return (ctx.last_status);
+	return (ctx.exit_status);
 }

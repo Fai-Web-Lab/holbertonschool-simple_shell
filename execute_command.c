@@ -74,7 +74,11 @@ void execute_command(shell_ctx_t *ctx, char *line)
 	run_child(cmd_path, args, ctx->env);
 
 	waitpid(pid, &status, 0);
-	ctx->last_status = status;
+
+	if (WIFEXITED(status))
+	ctx->exit_status = WEXITSTATUS(status);
+	else
+	ctx->exit_status = 2;
 
 	free(cmd_path);
 	free_tokens(args);

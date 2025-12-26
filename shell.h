@@ -14,6 +14,7 @@ typedef struct shell_ctx
 {
 	char **env;
 	int last_status;
+	int exit_status;
 	int should_exit;
 } shell_ctx_t;
 

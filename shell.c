@@ -61,11 +61,17 @@ void free_tokens(char **tokens)
 	*/
 int handle_builtin(shell_ctx_t *ctx, char **args)
 {
+	int status = ctx->exit_status;
+
 	if (!args || !args[0])
 	return (0);
 
 	if (strcmp(args[0], "exit") == 0)
 	{
+	if (args[1])
+	status = atoi(args[1]);
+
+	ctx->exit_status = status;
 	ctx->should_exit = 1;
 	return (1);
 	}

@@ -75,6 +75,18 @@ int handle_builtin(shell_ctx_t *ctx, char **args)
 	ctx->should_exit = 1;
 	return (1);
 	}
+	if (strcmp(args[0], "env") == 0)
+	{
+	int i = 0;
 
+	while (ctx->env[i])
+	{
+	write(STDOUT_FILENO, ctx->env[i], strlen(ctx->env[i]));
+	write(STDOUT_FILENO, "\n", 1);
+	i++;
+	}
+
+	return (1);
+	}
 	return (0);
 }

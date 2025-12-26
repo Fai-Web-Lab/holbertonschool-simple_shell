@@ -1,53 +1,69 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-#include <stdio.h>
 #include "shell.h"
 
 /**
-	* find_command - searches PATH for an executable command
-	* @cmd: command name (e.g., "ls")
-	* @ctx: shell context (unused but kept for structure)
+	* build_path - builds full path string "dir/cmd"
+	* @dir: directory from PATH
+	* @cmd: command name
 	*
-	* Return: malloc'd full path string or NULL if not found
+	* Return: malloc'd full path or NULL
+	*/
+static char *build_path(char *dir, char *cmd)
+{
+	size_t a = strlen(dir), b = strlen(cmd);
+	char *full = malloc(a + b + 2);
+
+	if (!full)
+	return (NULL);
+
+	memcpy(full, dir, a);
+	full[a] = '/';
+	memcpy(full + a + 1, cmd, b);
+	full[a + b + 1] = '\0';
+
+	return (full);
+}
+
+/**
+	* find_command - searches PATH for an executable command
+	* @cmd: command name
+	* @ctx: shell context (unused)
 	*
 	* Description:
-	* - If cmd starts with '/' or '.', treat it as direct path.
-	* - Otherwise search each directory in PATH.
-	* - Returns a malloc'd string that must be freed by caller.
+	* - Handles absolute/relative paths.
+	* - Iterates through PATH directories.
+	* - Builds full paths and checks X_OK.
+	* - Returns malloc'd string or NULL.
+	*
+	* Return: full path or NULL
 	*/
 char *find_command(char *cmd, shell_ctx_t *ctx)
 {
-	char *path = getenv("PATH");
-	char *copy, *dir, *full;
-	int len;
+	char *path = getenv("PATH"), *copy, *dir, *full;
 
 	(void)ctx;
+
 	if (cmd[0] == '/' || cmd[0] == '.')
-	{
-	if (access(cmd, X_OK) == 0)
-	return strdup(cmd);
-	return (NULL);
-	}
+	return (access(cmd, X_OK) == 0 ? strdup(cmd) : NULL);
 
 	if (!path)
 	return (NULL);
 
 	copy = strdup(path);
-	dir = strtok(copy, ":");
+	if (!copy)
+	return (NULL);
 
+	dir = strtok(copy, ":");
 	while (dir)
 	{
-	len = strlen(dir) + strlen(cmd) + 2;
-	full = malloc(len);
-	snprintf(full, len, "%s/%s", dir, cmd);
-
-	if (access(full, X_OK) == 0)
+	full = build_path(dir, cmd);
+	if (full && access(full, X_OK) == 0)
 	{
 	free(copy);
 	return (full);
 	}
-
 	free(full);
 	dir = strtok(NULL, ":");
 	}

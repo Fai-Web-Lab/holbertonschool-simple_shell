@@ -5,14 +5,14 @@
 
 /**
 	* split_line - splits input line into tokens
-	* @line: raw input string from getline
-	*
-	* Return: array of tokens (NULL-terminated)
+	* @line: raw input string
 	*
 	* Description:
-	* - Uses strtok to split by spaces, tabs, and newlines.
-	* - Allocates space for up to 64 tokens.
+	* - Uses strtok to split by whitespace.
+	* - Returns a NULL-terminated array of tokens.
 	* - Caller must free using free_tokens().
+	*
+	* Return: array of tokens or NULL
 	*/
 char **split_line(char *line)
 {
@@ -29,8 +29,8 @@ char **split_line(char *line)
 	tokens[i++] = token;
 	token = strtok(NULL, " \t\n\r");
 	}
-	tokens[i] = NULL;
 
+	tokens[i] = NULL;
 	return (tokens);
 }
 
@@ -39,7 +39,7 @@ char **split_line(char *line)
 	* @tokens: array returned by split_line
 	*
 	* Description:
-	* - Only frees the array itself.
+	* - Frees only the array itself.
 	* - Does NOT free the strings because they point inside the original buffer.
 	*/
 void free_tokens(char **tokens)
@@ -49,11 +49,15 @@ void free_tokens(char **tokens)
 }
 
 /**
-	* handle_builtin - handles built-in commands like exit
-	* @ctx: shell context (stores env + last status)
+	* handle_builtin - handles built-in commands
+	* @ctx: shell context
 	* @args: tokenized command
 	*
-	* Return: 1 if built-in executed, 0 otherwise
+	* Description:
+	* - Supports "exit" only.
+	* - Returns 1 if built-in executed, 0 otherwise.
+	*
+	* Return: 1 if handled, 0 otherwise
 	*/
 int handle_builtin(shell_ctx_t *ctx, char **args)
 {
@@ -62,11 +66,8 @@ int handle_builtin(shell_ctx_t *ctx, char **args)
 
 	if (strcmp(args[0], "exit") == 0)
 	{
-	if (isatty(STDIN_FILENO))
-	write(STDOUT_FILENO, "OK\n", 3);
-
-	free_tokens(args);
-	exit(ctx->last_status);
+	ctx->should_exit = 1;
+	return (1);
 	}
 
 	return (0);

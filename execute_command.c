@@ -1,85 +1,51 @@
 #include "shell.h"
-#include <unistd.h>
-#include <stdlib.h>
-#include <string.h>
-#include <errno.h>
-#include <sys/wait.h>
 
 /**
-	* print_not_found - prints command not found error
-	* @cmd: command name
-	*/
-static void print_not_found(char *cmd)
-{
-	write(STDERR_FILENO,
-	"simple_shell: command not found: ",
-	strlen("simple_shell: command not found: "));
-	write(STDERR_FILENO, cmd, strlen(cmd));
-	write(STDERR_FILENO, "\n", 1);
-}
-
-/**
-	* run_child - executes command in child process
-	* @cmd_path: full path to executable
-	* @args: argument list
-	* @env: environment variables
-	*/
-static void run_child(char *cmd_path, char **args, char **env)
-{
-	execve(cmd_path, args, env);
-	write(STDERR_FILENO, "simple_shell: ", 14);
-	write(STDERR_FILENO, strerror(errno), strlen(strerror(errno)));
-	write(STDERR_FILENO, "\n", 1);
-	exit(1);
-}
-
-/**
-	* execute_command - parses and executes a command
-	* @ctx: shell context
-	* @line: raw input line
+	* execute_child - execute command in child process
+	* @argv: arguments array
+	* @env: environment
 	*
-	* Description:
-	* - Splits line into tokens.
-	* - Handles built-ins.
-	* - Searches PATH.
-	* - Forks and executes external commands.
+	* Return: void
 	*/
-void execute_command(shell_ctx_t *ctx, char *line)
+void execute_child(char **argv, char **env)
 {
-	char **args = split_line(line);
 	char *cmd_path;
+
+	if (argv[0][0] == '/')
+	execve(argv[0], argv, env);
+
+	cmd_path = get_path(argv[0]);
+	if (cmd_path)
+	execve(cmd_path, argv, env);
+
+	perror("simple_shell");
+	exit(127);
+}
+
+/**
+	* execute_command - fork and execute command
+	* @argv: arguments array
+	* @env: environment
+	*
+	* Return: void
+	*/
+void execute_command(char **argv, char **env)
+{
 	pid_t pid;
 	int status;
 
-	if (!args || !args[0])
-	{
-	(free_tokens(args));
+	if (!argv || !argv[0])
 	return;
-	}
-	if (handle_builtin(ctx, args))
-	{
-	(free_tokens(args));
-	return;
-	}
-	cmd_path = find_command(args[0], ctx);
-	if (!cmd_path)
-	{
-	print_not_found(args[0]);
-	(free_tokens(args));
-	return;
-	}
 
 	pid = fork();
+	if (pid == -1)
+	{
+	perror("simple_shell");
+	return;
+	}
+
 	if (pid == 0)
-	run_child(cmd_path, args, ctx->env);
-
-	waitpid(pid, &status, 0);
-
-	if (WIFEXITED(status))
-	ctx->exit_status = WEXITSTATUS(status);
+	execute_child(argv, env);
 	else
-	ctx->exit_status = 2;
-
-	free(cmd_path);
-	free_tokens(args);
+	wait(&status);
 }

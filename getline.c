@@ -1,60 +1,98 @@
 #include "getline.h"
 #include <unistd.h>
 #include <stdlib.h>
-#include <string.h>
+
+#define READ_SIZE 1024
 
 /**
-	* _my_getline - custom implementation of getline
-	* @lineptr: pointer to buffer storing the read line
-	* @n: pointer to buffer size
-	*
-	* Description:
-	* - Reads from STDIN using read().
-	* - Reallocates buffer when needed.
-	* - Stops at newline.
-	* - Returns number of bytes read or -1 on EOF/error.
+	* refill_buffer - reads data into static buffer
+	* @buf: buffer
+	* @buf_len: current buffer length
+	* @buf_pos: current position
 	*
 	* Return: number of bytes read or -1
 	*/
-ssize_t _my_getline(char **lineptr, size_t *n)
+static ssize_t refill_buffer(char *buf, size_t *buf_len, size_t *buf_pos)
 {
-	char buffer[1024];
-	ssize_t bytes, total = 0, i;
-	char *new_ptr;
+	ssize_t r;
+
+	r = read(STDIN_FILENO, buf, READ_SIZE);
+	if (r <= 0)
+	return (-1);
+
+	*buf_len = r;
+	*buf_pos = 0;
+
+	return (r);
+}
+
+/**
+	* expand_line - reallocates line buffer if needed
+	* @lineptr: line buffer
+	* @n: buffer size
+	*
+	* Return: 0 on success, -1 on failure
+	*/
+static int expand_line(char **lineptr, size_t *n)
+{
+	char *tmp;
+	size_t new_size;
+
+	new_size = (*n) * 2;
+	tmp = realloc(*lineptr, new_size);
+	if (!tmp)
+	return (-1);
+
+	*lineptr = tmp;
+	*n = new_size;
+
+	return (0);
+}
+
+/**
+	* _getline - reads a line from stdin
+	* @lineptr: pointer to buffer
+	* @n: size of buffer
+	*
+	* Return: number of chars read, -1 on EOF
+	*/
+ssize_t _getline(char **lineptr, size_t *n)
+{
+	static char buffer[READ_SIZE];
+	static size_t buf_pos, buf_len;
+	size_t i;
+	ssize_t r;
 
 	if (!lineptr || !n)
 	return (-1);
 
 	if (*lineptr == NULL || *n == 0)
 	{
-	*n = 1024;
+	*n = READ_SIZE;
 	*lineptr = malloc(*n);
 	if (!*lineptr)
 	return (-1);
 	}
 
+	i = 0;
 	while (1)
 	{
-	bytes = read(STDIN_FILENO, buffer, 1024);
-	if (bytes <= 0)
-	return (total == 0 ? -1 : total);
+	if (buf_pos >= buf_len)
+	{
+	r = refill_buffer(buffer, &buf_len, &buf_pos);
+	if (r == -1)
+	return (i > 0 ? (ssize_t)i : -1);
+	}
 
-	if (total + bytes + 1 >= (ssize_t)*n)
-	{
-	*n *= 2;
-	new_ptr = realloc(*lineptr, *n);
-	if (!new_ptr)
+	if (i + 1 >= *n && expand_line(lineptr, n) == -1)
 	return (-1);
-	*lineptr = new_ptr;
-	}
-	for (i = 0; i < bytes; i++)
+
+	(*lineptr)[i++] = buffer[buf_pos++];
+
+	if ((*lineptr)[i - 1] == '\n')
 	{
-	(*lineptr)[total++] = buffer[i];
-	if (buffer[i] == '\n')
-	{
-	(*lineptr)[total] = '\0';
-	return (total);
-	}
+	(*lineptr)[i] = '\0';
+	return ((ssize_t)i);
 	}
 	}
 }

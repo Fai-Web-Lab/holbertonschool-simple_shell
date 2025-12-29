@@ -16,24 +16,42 @@
 	*/
 char **split_line(char *line)
 {
-	char **tokens = malloc(sizeof(char *) * 64);
-	char *token;
-	int i = 0;
+	int bufsize = 64, i = 0;
+	char **tokens = malloc(sizeof(char *) * bufsize);
+	int start = 0, end = 0;
 
 	if (!tokens)
 	return (NULL);
 
-	token = strtok(line, " \t\n\r");
-	while (token)
+	while (line[end] != '\0')
 	{
-	tokens[i++] = token;
-	token = strtok(NULL, " \t\n\r");
+	while (line[end] == ' ' || line[end] == '\t' || line[end] == '\n')
+	end++;
+
+	start = end;
+
+	while (line[end] != '\0' &&
+	line[end] != ' ' &&
+	line[end] != '\t' &&
+	line[end] != '\n')
+	end++;
+
+	if (start == end)
+	break;
+
+	tokens[i] = strndup(line + start, end - start);
+	i++;
+
+	if (i >= bufsize)
+	{
+	bufsize *= 2;
+	tokens = realloc(tokens, sizeof(char *) * bufsize);
+	}
 	}
 
 	tokens[i] = NULL;
 	return (tokens);
 }
-
 /**
 	* free_tokens - frees token array
 	* @tokens: array returned by split_line
@@ -44,10 +62,19 @@ char **split_line(char *line)
 	*/
 void free_tokens(char **tokens)
 {
-	if (tokens)
-	free(tokens);
-}
+    int i = 0;
 
+    if (!tokens)
+        return;
+
+    while (tokens[i])
+    {
+        free(tokens[i]);
+        i++;
+    }
+
+    free(tokens);
+}
 /**
 	* handle_builtin - handles built-in commands
 	* @ctx: shell context

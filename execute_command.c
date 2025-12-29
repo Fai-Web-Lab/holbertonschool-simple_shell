@@ -1,4 +1,7 @@
-#include "shell.h"
+#include <unistd.h>
+#include <sys/wait.h>
+#include <stdlib.h>
+#include <stdio.h>
 
 /**
 	* execute_child - execute command in child process
@@ -9,17 +12,11 @@
 	*/
 void execute_child(char **argv, char **env)
 {
-	char *cmd_path;
-
-	if (argv[0][0] == '/')
-	execve(argv[0], argv, env);
-
-	cmd_path = get_path(argv[0]);
-	if (cmd_path)
-	execve(cmd_path, argv, env);
-
+	if (execve(argv[0], argv, env) == -1)
+	{
 	perror("simple_shell");
-	exit(127);
+	exit(1);
+	}
 }
 
 /**

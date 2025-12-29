@@ -23,7 +23,8 @@ char **split_line(char *line);
 void free_tokens(char **tokens);
 int handle_builtin(shell_ctx_t *ctx, char **args);
 char *find_command(char *cmd, shell_ctx_t *ctx);
-void execute_command(shell_ctx_t *ctx, char *line);
+void execute_command(char **argv, char **env);
 ssize_t _my_getline(char **lineptr, size_t *n);
-
+char **split_line(char *line);
+void free_tokens(char **tokens);
 #endif

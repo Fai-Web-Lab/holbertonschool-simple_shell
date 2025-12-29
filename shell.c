@@ -4,15 +4,31 @@
 #include "shell.h"
 
 /**
-	* split_line - splits input line into tokens
-	* @line: raw input string
-	*
-	* Description:
-	* - Uses strtok to split by whitespace.
-	* - Returns a NULL-terminated array of tokens.
-	* - Caller must free using free_tokens().
-	*
-	* Return: array of tokens or NULL
+	* copy_token - copy a substring into a new buffer
+	* @line: input line
+	* @start: start index
+	* @len: length of token
+	* Return: pointer to new token
+	*/
+char *copy_token(char *line, int start, int len)
+{
+	char *token = malloc(len + 1);
+	int i;
+
+	if (!token)
+	return (NULL);
+
+	for (i = 0; i < len; i++)
+	token[i] = line[start + i];
+
+	token[len] = '\0';
+	return (token);
+}
+
+/**
+	* split_line - split input line into tokens
+	* @line: input string
+	* Return: NULL-terminated array of tokens
 	*/
 char **split_line(char *line)
 {
@@ -39,12 +55,10 @@ char **split_line(char *line)
 	break;
 
 	len = end - start;
-	tokens[i] = malloc(len + 1);
+	tokens[i] = copy_token(line, start, len);
 	if (!tokens[i])
 	return (NULL);
 
-	memcpy(tokens[i], line + start, len);
-	tokens[i][len] = '\0';
 	i++;
 
 	if (i >= bufsize)

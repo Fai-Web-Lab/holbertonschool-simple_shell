@@ -5,17 +5,16 @@
 #include <stddef.h>
 
 /**
-	* struct shell_ctx - holds shell state
+	* struct shell_ctx - context for shell state
 	* @env: environment variables
-	* @last_status: last command exit status
-	* @should_exit: flag to signal shell termination
+	* @should_exit: flag to exit shell
+	* @exit_status: last exit status
 	*/
 typedef struct shell_ctx
 {
 	char **env;
-	int last_status;
-	int exit_status;
 	int should_exit;
+	int exit_status;
 } shell_ctx_t;
 
 extern char **environ;
@@ -27,4 +26,14 @@ void execute_command(char **argv, char **env);
 ssize_t _my_getline(char **lineptr, size_t *n);
 char **split_line(char *line);
 void free_tokens(char **tokens);
+
+/**
+	* copy_token - copy substring into new allocated buffer
+	* @line: input line
+	* @start: start index
+	* @len: length of token
+	* Return: pointer to new token
+	*/
+char *copy_token(char *line, int start, int len);
+
 #endif

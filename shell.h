@@ -32,4 +32,5 @@ int builtin_unsetenv(shell_ctx_t *ctx, char **args);
 char *build_env_var(char *name, char *value);
 int find_env_index(char **env, char *name);
 char **copy_env(char **env);
+int builtin_env(shell_ctx_t *ctx);
 #endif

@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "shell.h"
-
+#include <stdio.h>
 /**
 	* split_line - Splits a line into tokens
 	* @line: Input string
@@ -59,4 +59,22 @@ char **copy_env(char **env)
 
 	new_env[count] = NULL;
 	return (new_env);
+}
+/**
+	* builtin_env - Prints the current environment variables
+	* @ctx: Shell context containing the environment array
+	*
+	* Return: Always 1 (indicates the command was handled)
+	*/
+
+int builtin_env(shell_ctx_t *ctx)
+{
+	int i = 0;
+
+	while (ctx->env[i])
+	{
+	printf("%s\n", ctx->env[i]);
+	i++;
+	}
+	return (1);
 }

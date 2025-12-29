@@ -136,13 +136,11 @@ int handle_builtin(shell_ctx_t *ctx, char **args)
 	if (strcmp(args[0], "unsetenv") == 0)
 	return (builtin_unsetenv(ctx, args));
 
-	if (strcmp(args[0], "printenv") == 0)
+	if (strcmp(args[0], "env") == 0)
 	{
-	int i;
-
-	for (i = 0; ctx->env[i]; i++)
-	printf("%s\n", ctx->env[i]);
+	builtin_env(ctx);
 	return (1);
-}
+	}
+
 	return (0);
 }

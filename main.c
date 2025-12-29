@@ -25,7 +25,9 @@ int main(int ac, char **av, char **env)
 
 	while (1)
 	{
-	printf("$ ");
+		if (isatty(STDIN_FILENO))
+			printf("$ ");
+
 	if (getline(&line, &len, stdin) == -1)
 	break;
 

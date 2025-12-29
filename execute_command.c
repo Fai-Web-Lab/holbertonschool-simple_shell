@@ -90,7 +90,7 @@ int handle_exit_error(char *arg)
 {
 	int start = 0, len = 0;
 
-	write(STDERR_FILENO, "./hsh: 1: exit: Illegal number:", 32);
+	write(STDERR_FILENO, "./hsh: 1: exit: Illegal number:", 33);
 
 	while (arg[start] == ' ')
 	start++;

@@ -1,7 +1,10 @@
 #ifndef SHELL_H
 #define SHELL_H
 
+#include <unistd.h>
+#include <stdlib.h>
 #include <sys/types.h>
+<<<<<<< HEAD
 #include <stddef.h>
 
 /**
@@ -35,5 +38,15 @@ void free_tokens(char **tokens);
 	* Return: pointer to new token
 	*/
 char *copy_token(char *line, int start, int len);
+=======
+#include <sys/wait.h>
+#include <sys/stat.h>
+
+extern char **environ;
+
+void print_prompt(void);
+int execute_command(char *cmd, char **args);
+void print_error(char *cmd);
+>>>>>>> 6c97ab6 (working on advanced 9: simple shell 0.1.1)
 
 #endif

@@ -1,9 +1,7 @@
-#include <stdlib.h>
-#include <string.h>
-#include <unistd.h>
 #include "shell.h"
 
 /**
+<<<<<<< HEAD
 	* copy_token - copy a substring into a new buffer
 	* @line: input line
 	* @start: start index
@@ -29,9 +27,13 @@ char *copy_token(char *line, int start, int len)
 	* split_line - split input line into tokens
 	* @line: input string
 	* Return: NULL-terminated array of tokens
+=======
+	* print_prompt - prints shell prompt
+>>>>>>> 6c97ab6 (working on advanced 9: simple shell 0.1.1)
 	*/
-char **split_line(char *line)
+void print_prompt(void)
 {
+<<<<<<< HEAD
 	int bufsize = 64, i = 0, start = 0, end = 0, len = 0;
 	char **tokens = malloc(sizeof(char *) * bufsize);
 
@@ -70,17 +72,17 @@ char **split_line(char *line)
 
 	tokens[i] = NULL;
 	return (tokens);
+=======
+	write(STDOUT_FILENO, "$ ", 2);
+>>>>>>> 6c97ab6 (working on advanced 9: simple shell 0.1.1)
 }
 /**
-	* free_tokens - frees token array
-	* @tokens: array returned by split_line
-	*
-	* Description:
-	* - Frees only the array itself.
-	* - Does NOT free the strings because they point inside the original buffer.
+	* print_error - prints command not found error
+	* @cmd: command name
 	*/
-void free_tokens(char **tokens)
+void print_error(char *cmd)
 {
+<<<<<<< HEAD
 	int i = 0;
 
 	if (!tokens)
@@ -135,4 +137,8 @@ int handle_builtin(shell_ctx_t *ctx, char **args)
 	return (1);
 	}
 	return (0);
+=======
+	write(STDERR_FILENO, cmd, 0);
+	write(STDERR_FILENO, ": not found\n", 12);
+>>>>>>> 6c97ab6 (working on advanced 9: simple shell 0.1.1)
 }

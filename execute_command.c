@@ -4,12 +4,13 @@
 #include <stdio.h>
 
 /**
-	* execute_child - execute command in child process
-	* @argv: arguments array
-	* @env: environment
+	* execute_command - executes a command with optional arguments
+	* @cmd: command path
+	* @args: NULL-terminated argument array (currently cmd only)
 	*
-	* Return: void
+	* Return: 0 on success, -1 on failure
 	*/
+<<<<<<< HEAD
 void execute_child(char **argv, char **env)
 {
 	if (execve(argv[0], argv, env) == -1)
@@ -27,22 +28,25 @@ void execute_child(char **argv, char **env)
 	* Return: void
 	*/
 void execute_command(char **argv, char **env)
+=======
+int execute_command(char *cmd, char **args)
+>>>>>>> 6c97ab6 (working on advanced 9: simple shell 0.1.1)
 {
 	pid_t pid;
-	int status;
+	struct stat st;
 
-	if (!argv || !argv[0])
-	return;
-
-	pid = fork();
-	if (pid == -1)
+	if (stat(cmd, &st) == -1)
 	{
-	perror("simple_shell");
-	return;
+	print_error(cmd);
+	return (-1);
 	}
 
+	pid = fork();
 	if (pid == 0)
-	execute_child(argv, env);
-	else
-	wait(&status);
+	{
+	execve(cmd, args, environ);
+	}
+
+	wait(NULL);
+	return (0);
 }

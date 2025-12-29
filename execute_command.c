@@ -88,20 +88,22 @@ int is_number(char *s)
 	*/
 int handle_exit_error(char *arg)
 {
-    int start = 0, len = 0;
+	int start = 0, len = 0;
 
-    write(STDERR_FILENO, "./hsh: 1: exit: Illegal number:", 32);
+	write(STDERR_FILENO, "./hsh: 1: exit: Illegal number:", 32);
 
-    while (arg[start] == ' ')
-        start++;
+	while (arg[start] == ' ')
+	start++;
 
-    len = strlen(arg + start);
+	len = strlen(arg + start);
 
-    if (len > 0 && arg[start + len - 1] == '\n')
-        len--;
+	if (len > 0 && arg[start + len - 1] == '\n')
+	len--;
 
-    write(STDERR_FILENO, arg + start, len);
+	write(STDERR_FILENO, " ", 1);
 
-    write(STDERR_FILENO, "\n", 1);
-    return (2);
+	write(STDERR_FILENO, arg + start, len);
+
+	write(STDERR_FILENO, "\n", 1);
+	return (2);
 }

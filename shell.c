@@ -107,7 +107,7 @@ void free_tokens(char **tokens)
 	*/
 int handle_builtin(shell_ctx_t *ctx, char **args)
 {
-	int status = ctx->exit_status;
+	int status;
 
 	if (!args || !args[0])
 	return (0);
@@ -116,11 +116,14 @@ int handle_builtin(shell_ctx_t *ctx, char **args)
 	{
 	if (args[1])
 	status = atoi(args[1]);
+	else
+	status = ctx->exit_status;
 
 	ctx->exit_status = status;
 	ctx->should_exit = 1;
 	return (1);
 	}
+
 	if (strcmp(args[0], "env") == 0)
 	{
 	int i = 0;
@@ -131,8 +134,8 @@ int handle_builtin(shell_ctx_t *ctx, char **args)
 	write(STDOUT_FILENO, "\n", 1);
 	i++;
 	}
-
 	return (1);
 	}
+
 	return (0);
 }

@@ -115,7 +115,7 @@ int handle_builtin(shell_ctx_t *ctx, char **args)
 	if (strcmp(args[0], "exit") == 0)
 	{
 	if (args[1])
-	status = atoi(args[1]);
+	status = _atoi(args[1]);
 	else
 	status = ctx->exit_status;
 

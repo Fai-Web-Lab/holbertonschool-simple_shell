@@ -23,7 +23,9 @@ int main(int ac, char **av, char **env)
 
 	while (1)
 	{
-	write(1, "$ ", 2);
+	if (isatty(STDIN_FILENO))
+		write(STDOUT_FILENO, "$ ", 2);
+
 
 	if (_getline(&line, &len) == -1)
 	break;

@@ -16,21 +16,20 @@
 	*/
 char **split_line(char *line)
 {
-	int bufsize = 64, i = 0;
+	int bufsize = 64, i = 0, start = 0, end = 0, len = 0;
 	char **tokens = malloc(sizeof(char *) * bufsize);
-	int start = 0, end = 0;
 
 	if (!tokens)
 	return (NULL);
 
-	while (line[end] != '\0')
+	while (line[end])
 	{
 	while (line[end] == ' ' || line[end] == '\t' || line[end] == '\n')
 	end++;
 
 	start = end;
 
-	while (line[end] != '\0' &&
+	while (line[end] &&
 	line[end] != ' ' &&
 	line[end] != '\t' &&
 	line[end] != '\n')
@@ -39,7 +38,13 @@ char **split_line(char *line)
 	if (start == end)
 	break;
 
-	tokens[i] = strndup(line + start, end - start);
+	len = end - start;
+	tokens[i] = malloc(len + 1);
+	if (!tokens[i])
+	return (NULL);
+
+	memcpy(tokens[i], line + start, len);
+	tokens[i][len] = '\0';
 	i++;
 
 	if (i >= bufsize)
@@ -62,18 +67,18 @@ char **split_line(char *line)
 	*/
 void free_tokens(char **tokens)
 {
-    int i = 0;
+	int i = 0;
 
-    if (!tokens)
-        return;
+	if (!tokens)
+	return;
 
-    while (tokens[i])
-    {
-        free(tokens[i]);
-        i++;
-    }
+	while (tokens[i])
+	{
+	free(tokens[i]);
+	i++;
+	}
 
-    free(tokens);
+	free(tokens);
 }
 /**
 	* handle_builtin - handles built-in commands

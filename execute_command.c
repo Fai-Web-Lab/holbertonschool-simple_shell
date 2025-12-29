@@ -88,8 +88,18 @@ int is_number(char *s)
 	*/
 int handle_exit_error(char *arg)
 {
+	int len = 0;
+
 	write(STDERR_FILENO, "./hsh: 1: exit: Illegal number: ", 33);
-	write(STDERR_FILENO, arg, strlen(arg));
+
+	if (arg)
+	{
+	len = strlen(arg);
+	if (len > 0 && arg[len - 1] == '\n')
+	len--;
+	write(STDERR_FILENO, arg, len);
+	}
+
 	write(STDERR_FILENO, "\n", 1);
 	return (2);
 }

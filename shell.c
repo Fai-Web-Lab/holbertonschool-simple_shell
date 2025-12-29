@@ -97,17 +97,13 @@ void free_tokens(char **tokens)
 /**
 	* handle_builtin - handles built-in commands
 	* @ctx: shell context
-	* @args: tokenized command
-	*
-	* Description:
-	* - Supports "exit" only.
-	* - Returns 1 if built-in executed, 0 otherwise.
+	* @args: command arguments
 	*
 	* Return: 1 if handled, 0 otherwise
 	*/
 int handle_builtin(shell_ctx_t *ctx, char **args)
 {
-	int status;
+	int status, i;
 
 	if (!args || !args[0])
 	return (0);
@@ -115,7 +111,15 @@ int handle_builtin(shell_ctx_t *ctx, char **args)
 	if (strcmp(args[0], "exit") == 0)
 	{
 	if (args[1])
+	{
+	if (!is_number(args[1]))
+	{
+	ctx->exit_status = 2;
+	handle_exit_error(args[1]);
+	return (1);
+	}
 	status = _atoi(args[1]);
+	}
 	else
 	status = ctx->exit_status;
 
@@ -126,13 +130,10 @@ int handle_builtin(shell_ctx_t *ctx, char **args)
 
 	if (strcmp(args[0], "env") == 0)
 	{
-	int i = 0;
-
-	while (ctx->env[i])
+	for (i = 0; ctx->env[i]; i++)
 	{
 	write(STDOUT_FILENO, ctx->env[i], strlen(ctx->env[i]));
 	write(STDOUT_FILENO, "\n", 1);
-	i++;
 	}
 	return (1);
 	}

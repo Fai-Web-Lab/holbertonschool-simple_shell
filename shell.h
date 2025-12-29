@@ -22,12 +22,13 @@ char **split_line(char *line);
 void free_tokens(char **tokens);
 int handle_builtin(shell_ctx_t *ctx, char **args);
 char *find_command(char *cmd, shell_ctx_t *ctx);
-void execute_command(char **argv, char **env);
+void execute_command(shell_ctx_t *ctx, char **argv, char **env);
 ssize_t _my_getline(char **lineptr, size_t *n);
 char **split_line(char *line);
 void free_tokens(char **tokens);
 int _atoi(char *s);
-
+int is_number(char *s);
+int handle_exit_error(char *arg);
 /**
 	* copy_token - copy substring into new allocated buffer
 	* @line: input line

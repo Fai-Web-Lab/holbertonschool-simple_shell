@@ -31,8 +31,9 @@ int main(int ac, char **av, char **env)
 	write(STDOUT_FILENO, "$ ", 2);
 
 	if (_getline(&line, &len) == -1)
+	{
 	break;
-
+	}
 	argv = split_line(line);
 if (handle_builtin(&ctx, argv))
 	{
@@ -45,11 +46,11 @@ if (handle_builtin(&ctx, argv))
 	continue;
 	}
 
-	execute_command(argv, env);
+	execute_command(&ctx, argv, env);
 
 	free_tokens(argv);
 	}
 
 	free(line);
-	return (0);
+	return (ctx.exit_status);
 }

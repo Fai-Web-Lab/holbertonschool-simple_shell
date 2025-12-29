@@ -1,120 +1,148 @@
 #include "shell.h"
-#include <unistd.h>
-#include <sys/wait.h>
+#include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include <string.h>
+
+
 /**
-	* execute_child - execute command in child process
-	* @argv: arguments array
-	* @env: environment
+	* find_env_index - Finds index of an environment variable
+	* @env: Environment array
+	* @name: Variable name
 	*
-	* Return: void
+	* Return: index or -1 if not found
 	*/
-void execute_child(char **argv, char **env)
+int find_env_index(char **env, char *name)
 {
-	if (execve(argv[0], argv, env) == -1)
-	{
-	perror("simple_shell");
-	exit(127);
-	}
+	int i, len = strlen(name);
+
+	for (i = 0; env[i]; i++)
+	if (strncmp(env[i], name, len) == 0 && env[i][len] == '=')
+	return (i);
+
+	return (-1);
 }
 
 /**
-	* execute_command - fork and execute command
-	* @ctx: shell context
-	* @argv: arguments array
-	* @env: environment
+	* build_env_var - Builds NAME=VALUE string
+	* @name: Variable name
+	* @value: Variable value
 	*
-	* Return: void
+	* Return: Newly allocated string or NULL
 	*/
-void execute_command(shell_ctx_t *ctx, char **argv, char **env)
+char *build_env_var(char *name, char *value)
 {
-	pid_t pid;
-	int status;
+	int len = strlen(name) + strlen(value) + 2;
+	char *var = malloc(len);
 
-	if (!argv || !argv[0])
-	return;
+	if (!var)
+	return (NULL);
 
-	pid = fork();
-	if (pid == -1)
-	{
-	perror("simple_shell");
-	ctx->exit_status = 1;
-	return;
-	}
+	strcpy(var, name);
+	strcat(var, "=");
+	strcat(var, value);
 
-	if (pid == 0)
-	execute_child(argv, env);
-	else
-	{
-	wait(&status);
-	if (WIFEXITED(status))
-	ctx->exit_status = WEXITSTATUS(status);
-	else
-	ctx->exit_status = 1;
-	}
+	return (var);
 }
+
 /**
-	* is_number - checks if a string represents a positive integer
-	* @s: input string
+	* builtin_setenv - Implements the setenv builtin command
+	* @ctx: Shell context
+	* @args: Command arguments
 	*
-	* Return: 1 if the string is a valid positive number, 0 otherwise
+	* Return: Always 1
 	*/
-int is_number(char *s)
+int builtin_setenv(shell_ctx_t *ctx, char **args)
 {
-	int i = 0;
+	int idx;
+	char *new_var;
 
-	if (!s)
-	return (0);
-
-	if (s[0] == '-')
-	return (0);
-
-	while (s[i])
+	if (!args[1] || !args[2])
 	{
-	if (s[i] < '0' || s[i] > '9')
-	return (0);
-	i++;
+	write(STDERR_FILENO, "setenv: Invalid arguments\n", 26);
+	return (1);
+	}
+
+	new_var = build_env_var(args[1], args[2]);
+	if (!new_var)
+	{
+	write(STDERR_FILENO, "setenv: malloc failed\n", 22);
+	return (1);
+	}
+
+	idx = find_env_index(ctx->env, args[1]);
+
+	if (idx >= 0)
+	ctx->env[idx] = new_var;
+	else
+	{
+	int i;
+
+	for (i = 0; ctx->env[i]; i++)
+	;
+	ctx->env[i] = new_var;
+	ctx->env[i + 1] = NULL;
 	}
 
 	return (1);
 }
+
 /**
-	* handle_exit_error - prints exit error message
-	* @arg: invalid argument
+	* builtin_unsetenv - Implements the unsetenv builtin command
+	* @ctx: Shell context
+	* @args: Command arguments
 	*
-	* Return: always 2
+	* Return: Always 1
 	*/
-int handle_exit_error(char *arg)
+int builtin_unsetenv(shell_ctx_t *ctx, char **args)
 {
-	int i = 0, len = 0;
-	char *msg = "./hsh: 1: exit: Illegal number:";
+	int i, j, len;
 
-	write(STDERR_FILENO, msg, strlen(msg));
+	if (!args[1])
+	{
+	write(STDERR_FILENO, "unsetenv: Invalid arguments\n", 28);
+	return (1);
+	}
 
-	while (arg[i] == ' ')
-	i++;
+	len = strlen(args[1]);
 
-	len = strlen(arg + i);
+	for (i = 0; ctx->env[i]; i++)
+	{
+	if (strncmp(ctx->env[i], args[1], len) == 0 && ctx->env[i][len] == '=')
+	{
+	for (j = i; ctx->env[j]; j++)
+	ctx->env[j] = ctx->env[j + 1];
+	return (1);
+	}
+	}
 
-	if (len > 0 && arg[i + len - 1] == '\n')
-	len--;
-
-	write(STDERR_FILENO, " ", 1);
-	write(STDERR_FILENO, arg + i, len);
-	write(STDERR_FILENO, "\n", 1);
-
-	return (2);
+	return (1);
 }
+
 /**
-	* sigint_handler - Handles Ctrl+C signal (SIGINT)
-	* @sig: The signal number
+	* handle_builtin - Checks and executes builtin commands
+	* @ctx: Shell context
+	* @args: Parsed command arguments
 	*
-	* Prevents the shell from exiting and prints a new prompt.
+	* Return: 1 if builtin executed, 0 otherwise
 	*/
-void sigint_handler(int sig)
+int handle_builtin(shell_ctx_t *ctx, char **args)
 {
-	(void)sig;
-	write(STDOUT_FILENO, "\n$ ", 3);
+	if (!args || !args[0])
+	return (0);
+
+	if (strcmp(args[0], "setenv") == 0)
+	return (builtin_setenv(ctx, args));
+
+	if (strcmp(args[0], "unsetenv") == 0)
+	return (builtin_unsetenv(ctx, args));
+
+	if (strcmp(args[0], "printenv") == 0)
+	{
+	int i;
+
+	for (i = 0; ctx->env[i]; i++)
+	printf("%s\n", ctx->env[i]);
+	return (1);
+}
+	return (0);
 }

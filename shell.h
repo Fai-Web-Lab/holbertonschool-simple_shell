@@ -3,6 +3,7 @@
 
 #include <sys/types.h>
 #include <stddef.h>
+#include <unistd.h>
 
 /**
 	* struct shell_ctx - context for shell state
@@ -26,17 +27,9 @@ void execute_command(shell_ctx_t *ctx, char **argv, char **env);
 ssize_t _my_getline(char **lineptr, size_t *n);
 char **split_line(char *line);
 void free_tokens(char **tokens);
-int _atoi(char *s);
-int is_number(char *s);
-int handle_exit_error(char *arg);
-void sigint_handler(int sig);
-/**
-	* copy_token - copy substring into new allocated buffer
-	* @line: input line
-	* @start: start index
-	* @len: length of token
-	* Return: pointer to new token
-	*/
-char *copy_token(char *line, int start, int len);
-
+int builtin_setenv(shell_ctx_t *ctx, char **args);
+int builtin_unsetenv(shell_ctx_t *ctx, char **args);
+char *build_env_var(char *name, char *value);
+int find_env_index(char **env, char *name);
+char **copy_env(char **env);
 #endif

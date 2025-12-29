@@ -1,15 +1,13 @@
 #include "shell.h"
-#include "getline.h"
-#include <unistd.h>
+#include <stdio.h>
 #include <stdlib.h>
-#include <signal.h>
-
+#include <string.h>
 
 /**
-	* main - Entry point of the shell
-	* @ac: argument count (unused)
-	* @av: argument vector (unused)
-	* @env: environment variables
+	* main - Minimal shell for setenv/unsetenv
+	* @ac: unused
+	* @av: unused
+	* @env: environment
 	*
 	* Return: Always 0
 	*/
@@ -23,38 +21,26 @@ int main(int ac, char **av, char **env)
 	(void)ac;
 	(void)av;
 
-	ctx.env = env;
-	ctx.should_exit = 0;
-	ctx.exit_status = 0;
-
-	signal(SIGINT, sigint_handler);
+	ctx.env = copy_env(env);
 
 	while (1)
 	{
-	if (isatty(STDIN_FILENO))
-	write(STDOUT_FILENO, "$ ", 2);
-
-	if (_getline(&line, &len) == -1)
-	{
+	printf("$ ");
+	if (getline(&line, &len, stdin) == -1)
 	break;
-	}
+
 	argv = split_line(line);
-if (handle_builtin(&ctx, argv))
+
+	if (handle_builtin(&ctx, argv))
 	{
 	free_tokens(argv);
-	if (ctx.should_exit)
-	{
-	free(line);
-	exit(ctx.exit_status);
-	}
 	continue;
 	}
 
-	execute_command(&ctx, argv, env);
-
+	printf("Command not supported\n");
 	free_tokens(argv);
 	}
 
 	free(line);
-	return (ctx.exit_status);
+	return (0);
 }

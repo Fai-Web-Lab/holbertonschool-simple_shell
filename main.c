@@ -2,6 +2,8 @@
 #include "getline.h"
 #include <unistd.h>
 #include <stdlib.h>
+#include <signal.h>
+
 
 /**
 	* main - Entry point of the shell
@@ -24,6 +26,8 @@ int main(int ac, char **av, char **env)
 	ctx.env = env;
 	ctx.should_exit = 0;
 	ctx.exit_status = 0;
+
+	signal(SIGINT, sigint_handler);
 
 	while (1)
 	{

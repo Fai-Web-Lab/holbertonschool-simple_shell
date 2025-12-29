@@ -107,3 +107,14 @@ int handle_exit_error(char *arg)
 
 	return (2);
 }
+/**
+	* sigint_handler - Handles Ctrl+C signal (SIGINT)
+	* @sig: The signal number
+	*
+	* Prevents the shell from exiting and prints a new prompt.
+	*/
+void sigint_handler(int sig)
+{
+	(void)sig;
+	write(STDOUT_FILENO, "\n$ ", 3);
+}

@@ -29,6 +29,7 @@ void free_tokens(char **tokens);
 int _atoi(char *s);
 int is_number(char *s);
 int handle_exit_error(char *arg);
+void sigint_handler(int sig);
 /**
 	* copy_token - copy substring into new allocated buffer
 	* @line: input line

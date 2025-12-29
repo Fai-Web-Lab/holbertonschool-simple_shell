@@ -139,3 +139,32 @@ int handle_builtin(shell_ctx_t *ctx, char **args)
 
 	return (0);
 }
+/**
+	* _atoi - convert a string to an integer
+	* @s: input string
+	*
+	* Return: converted integer value
+	*/
+int _atoi(char *s)
+{
+	int i = 0, sign = 1, num = 0;
+
+	if (!s)
+	return (0);
+
+	if (s[0] == '-')
+	{
+	sign = -1;
+	i++;
+	}
+
+	for (; s[i] != '\0'; i++)
+	{
+	if (s[i] < '0' || s[i] > '9')
+	break;
+	num = num * 10 + (s[i] - '0');
+	}
+
+	return (num * sign);
+}
+

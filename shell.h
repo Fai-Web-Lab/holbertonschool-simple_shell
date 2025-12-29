@@ -26,6 +26,7 @@ void execute_command(char **argv, char **env);
 ssize_t _my_getline(char **lineptr, size_t *n);
 char **split_line(char *line);
 void free_tokens(char **tokens);
+int _atoi(char *s);
 
 /**
 	* copy_token - copy substring into new allocated buffer

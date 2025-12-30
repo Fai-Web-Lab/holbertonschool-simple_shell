@@ -1,11 +1,11 @@
 #include "shell.h"
 
 /**
-	* handle_builtin - checks if command is a builtin and executes it
-	* @argv: argument vector
-	* @ctx: shell context structure
+	* handle_builtin - executes built-in commands
+	* @argv: arguments
+	* @ctx: shell context
 	*
-	* Return: 1 if command was a builtin, 0 otherwise
+	* Return: 1 if handled, 0 otherwise
 	*/
 int handle_builtin(char **argv, shell_ctx_t *ctx)
 {

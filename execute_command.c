@@ -1,53 +1,38 @@
 #include "shell.h"
-#include <stdio.h>
-#include <sys/types.h>
-#include <sys/wait.h>
-#include <unistd.h>
-#include <stdlib.h>
 
 /**
-	* execute_command - executes a command with arguments
-	* @cmd: command name or path
-	* @args: arguments array, NULL-terminated
-	* @env: environment array
-	*
-	* Return: child process exit status, -1 on failure
+	* execute_command - forks and executes
+	* @argv: arguments
+	* @ctx: context
 	*/
-int execute_command(char *cmd, char **args, char **env)
+void execute_command(char **argv, shell_ctx_t *ctx)
 {
-	pid_t pid;
+	pid_t child;
 	int status;
 	char *path;
 
-	if (cmd[0] != '/')
-	{
-	path = get_path(cmd, env);
+	path = find_path(argv[0], ctx->env);
 	if (!path)
 	{
-	write(STDERR_FILENO, cmd, strlen(cmd));
-	write(STDERR_FILENO, ": not found\n", 12);
-	return (-1);
-	}
-	cmd = path;
+	fprintf(stderr, "./shell: %s: not found\n", argv[0]);
+	ctx->exit_status = 127;
+	return;
 	}
 
-	pid = fork();
-	if (pid == 0)
+	child = fork();
+	if (child == 0)
 	{
-	execve(cmd, args, env);
-	perror("execve failed");
-	exit(EXIT_FAILURE);
+	if (execve(path, argv, ctx->env) == -1)
+	{
+	perror("execve");
+	exit(1);
 	}
-	else if (pid > 0)
-	{
-	wait(&status);
-	if (cmd != args[0])
-	free(cmd);
-	return (status);
 	}
 	else
 	{
-	perror("fork failed");
-	return (-1);
+	waitpid(child, &status, 0);
+	if (WIFEXITED(status))
+	ctx->exit_status = WEXITSTATUS(status);
 	}
+	free(path);
 }

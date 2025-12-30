@@ -1,40 +1,44 @@
 #include "shell.h"
 
 /**
-	* main - main shell loop
-	*
-	* Return: 0 on success
+	* main - Entry point for simple shell
+	* Return: last exit status
 	*/
 int main(void)
 {
-	char *line = NULL;
-	size_t len = 0;
-	ssize_t read;
-	char *args[64];
+	char *line = NULL, *token, *argv[64];
+	size_t n = 0;
 	int i;
-	char *token;
+	shell_ctx_t ctx;
 
-	while (1)
+	ctx.exit_status = 0;
+	ctx.should_exit = 0;
+	ctx.env = environ;
+
+	while (!ctx.should_exit)
 	{
-	write(STDOUT_FILENO, "$ ", 2);
+	if (isatty(STDIN_FILENO))
+	write(STDOUT_FILENO, "#cisfun$ ", 9);
 
-	read = _getline(&line, &len, STDIN_FILENO);
-	if (read == -1)
+	if (_getline(&line, &n, STDIN_FILENO) == -1)
 	break;
 
+	line[strcspn(line, "\n")] = '\0';
 	i = 0;
-	token = strtok(line, " \t\n");
+	token = strtok(line, " \t");
 	while (token && i < 63)
 	{
-	args[i++] = token;
-	token = strtok(NULL, " \t\n");
+	argv[i++] = token;
+	token = strtok(NULL, " \t");
 	}
-	args[i] = NULL;
+	argv[i] = NULL;
 
-	if (args[0])
-	execute_command(args[0], args, environ);
+	if (argv[0] != NULL)
+	{
+	if (!handle_builtin(argv, &ctx))
+	execute_command(argv, &ctx);
 	}
-
+	}
 	free(line);
-	return (0);
+	return (ctx.exit_status);
 }

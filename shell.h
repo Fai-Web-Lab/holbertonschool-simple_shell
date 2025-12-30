@@ -1,33 +1,35 @@
 #ifndef SHELL_H
 #define SHELL_H
 
-#include <stddef.h>
-#include <unistd.h>
+#include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <sys/stat.h>
-#include <stdio.h>
-#include <string.h>
+#include "getline.h"
 
+#define BUF_SIZE 1024
 extern char **environ;
 
 /**
-	* struct shell_ctx_s - Shell context
+	* struct shell_ctx - Shell state context
+	* @exit_status: Last command exit status
+	* @should_exit: Exit flag
 	* @env: Environment variables
 	*/
-typedef struct shell_ctx_s
+typedef struct shell_ctx
 {
+	int exit_status;
+	int should_exit;
 	char **env;
 } shell_ctx_t;
 
-void print_prompt(void);
-int execute_command(char *cmd, char **args, char **env);
-void print_error(char *cmd);
-char *get_path(char *cmd, char **env);
-char *copy_token(char *line, int start, int len);
-char **copy_env(char **env);
-int builtin_env(shell_ctx_t *ctx);
-ssize_t _getline(char **lineptr, size_t *n, int fd);
+/* Prototypes */
+void execute_command(char **argv, shell_ctx_t *ctx);
+char *get_path_value(char **env);
+char *find_path(char *command, char **env);
+int handle_builtin(char **argv, shell_ctx_t *ctx);
 
 #endif

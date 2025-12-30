@@ -35,6 +35,7 @@ char *copy_token(char *line, int start, int len)
 	*/
 void print_prompt(void)
 {
+	if (isatty(STDIN_FILENO))
 	write(STDOUT_FILENO, "$ ", 2);
 }
 

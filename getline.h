@@ -2,6 +2,8 @@
 #define GETLINE_H
 
 #include <unistd.h>
+#include <stddef.h>
+#include <sys/types.h>
 #include <stdlib.h>
 
 #define READ_SIZE 1024

@@ -8,6 +8,7 @@
 #include <sys/wait.h>
 #include <sys/stat.h>
 #include "getline.h"
+#include <signal.h>
 
 #define BUF_SIZE 1024
 
@@ -28,6 +29,7 @@ typedef struct shell_ctx
 	char **env;
 } shell_ctx_t;
 
+char **copy_env(void);
 void execute_command(char **argv, shell_ctx_t *ctx);
 char *find_path(char *command, char **env);
 int handle_builtin(char **argv, shell_ctx_t *ctx);

@@ -1,6 +1,16 @@
 #include "shell.h"
 
 /**
+	* handle_sigint - Signal handler for SIGINT (Ctrl+C)
+	* @sig: The signal number
+	*/
+void handle_sigint(int sig)
+{
+	(void)sig;
+	write(STDOUT_FILENO, "\n#cisfun$ ", 10);
+}
+
+/**
 	* main - Entry point for the simple shell
 	* Return: The exit status of the shell
 	*/

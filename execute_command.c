@@ -1,9 +1,9 @@
 #include "shell.h"
 
 /**
-	* execute_command - forks and executes
-	* @argv: arguments
-	* @ctx: context
+	* execute_command - forks and executes the command
+	* @argv: argument array
+	* @ctx: shell context
 	*/
 void execute_command(char **argv, shell_ctx_t *ctx)
 {
@@ -14,11 +14,12 @@ void execute_command(char **argv, shell_ctx_t *ctx)
 	path = find_path(argv[0], ctx->env);
 	if (!path)
 	{
-	fprintf(stderr, "./shell: %s: not found\n", argv[0]);
+	write(STDERR_FILENO, "./hsh: 1: ", 10);
+	write(STDERR_FILENO, argv[0], _strlen(argv[0]));
+	write(STDERR_FILENO, ": not found\n", 12);
 	ctx->exit_status = 127;
 	return;
 	}
-
 	child = fork();
 	if (child == 0)
 	{
@@ -28,11 +29,13 @@ void execute_command(char **argv, shell_ctx_t *ctx)
 	exit(1);
 	}
 	}
-	else
+	else if (child > 0)
 	{
 	waitpid(child, &status, 0);
 	if (WIFEXITED(status))
 	ctx->exit_status = WEXITSTATUS(status);
 	}
+	else
+	perror("fork");
 	free(path);
 }

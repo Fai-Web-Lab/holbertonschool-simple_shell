@@ -1,8 +1,8 @@
 #include "shell.h"
 
 /**
-	* main - Entry point for simple shell
-	* Return: last exit status
+	* main - Entry point for the simple shell
+	* Return: The exit status of the shell
 	*/
 int main(void)
 {
@@ -23,13 +23,18 @@ int main(void)
 	if (_getline(&line, &n, STDIN_FILENO) == -1)
 	break;
 
-	line[strcspn(line, "\n")] = '\0';
+	for (i = 0; line[i]; i++)
+	{
+	if (line[i] == '\n')
+	line[i] = '\0';
+	}
+
 	i = 0;
-	token = strtok(line, " \t");
+	token = _strtok(line, " \t");
 	while (token && i < 63)
 	{
 	argv[i++] = token;
-	token = strtok(NULL, " \t");
+	token = _strtok(NULL, " \t");
 	}
 	argv[i] = NULL;
 

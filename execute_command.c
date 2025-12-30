@@ -1,9 +1,49 @@
 #include "shell.h"
 
 /**
-	* execute_command - forks and executes the command
-	* @argv: argument array
-	* @ctx: shell context
+	* _strlen - returns the length of a string
+	* @s: string to evaluate
+	*
+	* Return: length of the string
+	*/
+int _strlen(char *s)
+{
+	int i = 0;
+
+	while (s && s[i])
+	i++;
+	return (i);
+}
+
+/**
+	* _strdup - duplicates a string
+	* @str: string to duplicate
+	*
+	* Return: pointer to the new string, or NULL if it fails
+	*/
+char *_strdup(char *str)
+{
+	char *dup;
+	int i, len;
+
+	if (!str)
+	return (NULL);
+
+	len = _strlen(str);
+	dup = malloc(len + 1);
+	if (!dup)
+	return (NULL);
+
+	for (i = 0; i <= len; i++)
+	dup[i] = str[i];
+
+	return (dup);
+}
+
+/**
+	* execute_command - fork and execve a command
+	* @argv: argument vector
+	* @ctx: shell context structure
 	*/
 void execute_command(char **argv, shell_ctx_t *ctx)
 {
@@ -29,13 +69,11 @@ void execute_command(char **argv, shell_ctx_t *ctx)
 	exit(1);
 	}
 	}
-	else if (child > 0)
+	else
 	{
 	waitpid(child, &status, 0);
 	if (WIFEXITED(status))
 	ctx->exit_status = WEXITSTATUS(status);
 	}
-	else
-	perror("fork");
 	free(path);
 }

@@ -32,7 +32,8 @@ void execute_command(char **argv, shell_ctx_t *ctx);
 char *find_path(char *command, char **env);
 int handle_builtin(char **argv, shell_ctx_t *ctx);
 void handle_sigint(int sig);
-
+int _setenv(char **argv, shell_ctx_t *ctx);
+int _unsetenv(char **argv, shell_ctx_t *ctx);
 void *_realloc(void *ptr, unsigned int old_size, unsigned int new_size);
 int _strlen(char *s);
 int _strcmp(char *s1, char *s2);

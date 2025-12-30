@@ -1,76 +1,46 @@
 #include "shell.h"
 
 /**
-	* build_full_path - combines dir and cmd without sprintf
-	* @dir: directory
-	* @command: command
-	* Return: full path string
+	* _realloc - reallocates a memory block
+	* @ptr: old pointer
+	* @old_size: old size in bytes
+	* @new_size: new size in bytes
+	*
+	* Return: pointer to new memory block
 	*/
-char *build_full_path(char *dir, char *command)
+void *_realloc(void *ptr, unsigned int old_size, unsigned int new_size)
 {
-	char *full;
-	int i, j;
+	char *new_ptr, *old_ptr = ptr;
+	unsigned int i;
 
-	full = malloc(_strlen(dir) + _strlen(command) + 2);
-	if (!full)
+	if (new_size == old_size)
+	return (ptr);
+	if (new_size == 0 && ptr != NULL)
+	{
+	free(ptr);
 	return (NULL);
-	for (i = 0; dir[i]; i++)
-	full[i] = dir[i];
-	full[i++] = '/';
-	for (j = 0; command[j]; j++)
-	full[i + j] = command[j];
-	full[i + j] = '\0';
-	return (full);
+	}
+	if (ptr == NULL)
+	return (malloc(new_size));
+
+	new_ptr = malloc(new_size);
+	if (!new_ptr)
+	return (NULL);
+
+	for (i = 0; i < old_size && i < new_size; i++)
+	new_ptr[i] = old_ptr[i];
+
+	free(ptr);
+	return (new_ptr);
 }
 
 /**
-	* find_path - finds command in PATH
-	* @command: command name
-	* @env: environment
-	* Return: path or NULL
-	*/
-char *find_path(char *command, char **env)
-{
-	char *path_val = NULL, *path_copy, *dir, *full;
-	struct stat st;
-	int i = 0;
-
-	if (stat(command, &st) == 0)
-	return (_strdup(command));
-	while (env[i])
-	{
-	if (_strncmp(env[i], "PATH=", 5) == 0)
-	{
-	path_val = env[i] + 5;
-	break;
-	}
-	i++;
-	}
-	if (!path_val)
-	return (NULL);
-	path_copy = _strdup(path_val);
-	dir = _strtok(path_copy, ":");
-	while (dir)
-	{
-	full = build_full_path(dir, command);
-	if (full && stat(full, &st) == 0)
-	{
-	free(path_copy);
-	return (full);
-	}
-	free(full);
-	dir = _strtok(NULL, ":");
-	}
-	free(path_copy);
-	return (NULL);
-}
-
-/**
-	* _strncmp - compares n characters of strings
+	* _strncmp - compares n characters of two strings
 	* @s1: string 1
 	* @s2: string 2
-	* @n: char count
-	* Return: difference
+	* @n: number of characters to compare
+	*
+	* Return: difference between strings
 	*/
 int _strncmp(char *s1, char *s2, size_t n)
 {
@@ -87,36 +57,74 @@ int _strncmp(char *s1, char *s2, size_t n)
 }
 
 /**
-	* _strdup - duplicates a string
-	* @str: string to dup
-	* Return: pointer to new string
+	* build_full_path - concatenates dir and command
+	* @dir: directory path
+	* @command: command name
+	*
+	* Return: full path string
 	*/
-char *_strdup(char *str)
+char *build_full_path(char *dir, char *command)
 {
-	char *dup;
-	int i, len;
+	char *full;
+	int i, j;
 
-	if (!str)
+	full = malloc(_strlen(dir) + _strlen(command) + 2);
+	if (!full)
 	return (NULL);
-	len = _strlen(str);
-	dup = malloc(sizeof(char) * (len + 1));
-	if (!dup)
-	return (NULL);
-	for (i = 0; i <= len; i++)
-	dup[i] = str[i];
-	return (dup);
+
+	for (i = 0; dir[i]; i++)
+	full[i] = dir[i];
+
+	full[i++] = '/';
+
+	for (j = 0; command[j]; j++)
+	full[i + j] = command[j];
+
+	full[i + j] = '\0';
+	return (full);
 }
 
 /**
-	* _strlen - returns string length
-	* @s: string
-	* Return: length
+	* find_path - locates a command in the PATH
+	* @command: command to find
+	* @env: environment variables
+	*
+	* Return: full path or NULL if not found
 	*/
-int _strlen(char *s)
+char *find_path(char *command, char **env)
 {
-	int len = 0;
+	char *path_val = NULL, *path_copy, *dir, *full;
+	struct stat st;
+	int i = 0;
 
-	while (s && s[len])
-	len++;
-	return (len);
+	if (stat(command, &st) == 0)
+	return (_strdup(command));
+
+	while (env[i])
+	{
+	if (_strncmp(env[i], "PATH=", 5) == 0)
+	{
+	path_val = env[i] + 5;
+	break;
+	}
+	i++;
+	}
+	if (!path_val)
+	return (NULL);
+
+	path_copy = _strdup(path_val);
+	dir = _strtok(path_copy, ":");
+	while (dir)
+	{
+	full = build_full_path(dir, command);
+	if (full && stat(full, &st) == 0)
+	{
+	free(path_copy);
+	return (full);
+	}
+	free(full);
+	dir = _strtok(NULL, ":");
+	}
+	free(path_copy);
+	return (NULL);
 }

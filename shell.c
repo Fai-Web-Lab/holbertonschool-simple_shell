@@ -1,43 +1,46 @@
 #include "shell.h"
 
 /**
-	* _realloc - reallocates a memory block using malloc and free
-	* @ptr: pointer to the memory previously allocated
-	* @old_size: size in bytes of the allocated space for ptr
-	* @new_size: size in bytes of the new memory block
-	* Return: pointer to the new memory block
+	* _strcmp - compares two strings
+	* @s1: first string
+	* @s2: second string
+	*
+	* Return: difference
 	*/
-void *_realloc(void *ptr, unsigned int old_size, unsigned int new_size)
+int _strcmp(char *s1, char *s2)
 {
-	char *new_ptr, *old_ptr = ptr;
-	unsigned int i;
-
-	if (new_size == old_size)
-	return (ptr);
-	if (new_size == 0 && ptr != NULL)
+	while (*s1 && *s2 && *s1 == *s2)
 	{
-	free(ptr);
-	return (NULL);
+	s1++;
+	s2++;
 	}
-	if (ptr == NULL)
-	return (malloc(new_size));
+	return (*s1 - *s2);
+}
 
-	new_ptr = malloc(new_size);
-	if (new_ptr == NULL)
-	return (NULL);
-
-	for (i = 0; i < old_size && i < new_size; i++)
-	new_ptr[i] = old_ptr[i];
-
-	free(ptr);
-	return (new_ptr);
+/**
+	* is_delim - checks if char is a delimiter
+	* @c: char to check
+	* @delim: delimiter string
+	*
+	* Return: 1 if true, 0 if false
+	*/
+int is_delim(char c, const char *delim)
+{
+	while (*delim)
+	{
+	if (c == *delim)
+	return (1);
+	delim++;
+	}
+	return (0);
 }
 
 /**
 	* _strtok - custom string tokenizer
 	* @str: string to tokenize
 	* @delim: delimiter string
-	* Return: pointer to next token or NULL
+	*
+	* Return: pointer to next token
 	*/
 char *_strtok(char *str, const char *delim)
 {
@@ -68,9 +71,10 @@ char *_strtok(char *str, const char *delim)
 }
 
 /**
-	* handle_builtin - checks and executes exit or env
+	* handle_builtin - executes built-in commands
 	* @argv: arguments
 	* @ctx: shell context
+	*
 	* Return: 1 if handled, 0 otherwise
 	*/
 int handle_builtin(char **argv, shell_ctx_t *ctx)
@@ -90,39 +94,6 @@ int handle_builtin(char **argv, shell_ctx_t *ctx)
 	write(STDOUT_FILENO, "\n", 1);
 	}
 	return (1);
-	}
-	return (0);
-}
-
-/**
-	* _strcmp - compares two strings
-	* @s1: string 1
-	* @s2: string 2
-	* Return: 0 if equal
-	*/
-int _strcmp(char *s1, char *s2)
-{
-	while (*s1 && *s2 && *s1 == *s2)
-	{
-	s1++;
-	s2++;
-	}
-	return (*s1 - *s2);
-}
-
-/**
-	* is_delim - checks if a character is a delimiter
-	* @c: char to check
-	* @delim: delimiter string
-	* Return: 1 if true, 0 if false
-	*/
-int is_delim(char c, const char *delim)
-{
-	while (*delim)
-	{
-	if (c == *delim)
-	return (1);
-	delim++;
 	}
 	return (0);
 }

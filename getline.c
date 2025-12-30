@@ -1,11 +1,12 @@
 #include "shell.h"
 
 /**
-	* _getline - reads input from a file descriptor into a buffer
-	* @lineptr: pointer to the buffer
-	* @n: pointer to the size of the buffer
+	* _getline - reads input from a stream
+	* @lineptr: buffer to store the input
+	* @n: size of the buffer
 	* @fd: file descriptor to read from
-	* Return: number of characters read or -1 on failure/EOF
+	*
+	* Return: number of characters read, or -1 on failure
 	*/
 ssize_t _getline(char **lineptr, size_t *n, int fd)
 {

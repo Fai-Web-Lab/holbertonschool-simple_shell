@@ -2,8 +2,8 @@
 #include <signal.h>
 
 /**
-	* handle_sigint - Signal handler for SIGINT (Ctrl+C)
-	* @sig: The signal number
+	* handle_sigint - Signal handler for Ctrl+C
+	* @sig: Signal number
 	*/
 void handle_sigint(int sig)
 {
@@ -12,9 +12,8 @@ void handle_sigint(int sig)
 }
 
 /**
-	* main - Entry point for the simple shell
-	*
-	* Return: The exit status of the shell
+	* main - Entry point
+	* Return: Exit status
 	*/
 int main(void)
 {
@@ -26,7 +25,6 @@ int main(void)
 	ctx.exit_status = 0;
 	ctx.should_exit = 0;
 	ctx.env = copy_env();
-
 	signal(SIGINT, handle_sigint);
 	while (!ctx.should_exit)
 	{
@@ -48,7 +46,6 @@ int main(void)
 	if (argv[0] != NULL && !handle_builtin(argv, &ctx))
 	execute_command(argv, &ctx);
 	}
-
 	for (i = 0; ctx.env[i]; i++)
 	free(ctx.env[i]);
 	free(ctx.env);

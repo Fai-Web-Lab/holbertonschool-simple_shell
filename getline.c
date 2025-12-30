@@ -12,7 +12,7 @@ ssize_t _getline(char **lineptr, size_t *n, int fd)
 	static char buffer[BUF_SIZE];
 	static size_t pos;
 	static size_t bytes;
-	size_t i = 0;
+	size_t i = 0, old_n;
 	char c;
 
 	if (*lineptr == NULL || *n == 0)
@@ -34,8 +34,9 @@ ssize_t _getline(char **lineptr, size_t *n, int fd)
 	c = buffer[pos++];
 	if (i >= *n - 1)
 	{
+	old_n = *n;
 	*n += BUF_SIZE;
-	*lineptr = (char *)realloc(*lineptr, *n);
+	*lineptr = _realloc(*lineptr, old_n, *n);
 	if (!*lineptr)
 	return (-1);
 	}

@@ -1,20 +1,36 @@
 #include "shell.h"
 
 /**
-	* is_delim - checks if a character is a delimiter
-	* @c: char to check
-	* @delim: delimiter string
-	* Return: 1 if true, 0 if false
+	* _realloc - reallocates a memory block using malloc and free
+	* @ptr: pointer to the memory previously allocated
+	* @old_size: size in bytes of the allocated space for ptr
+	* @new_size: size in bytes of the new memory block
+	* Return: pointer to the new memory block
 	*/
-int is_delim(char c, const char *delim)
+void *_realloc(void *ptr, unsigned int old_size, unsigned int new_size)
 {
-	while (*delim)
+	char *new_ptr, *old_ptr = ptr;
+	unsigned int i;
+
+	if (new_size == old_size)
+	return (ptr);
+	if (new_size == 0 && ptr != NULL)
 	{
-	if (c == *delim)
-	return (1);
-	delim++;
+	free(ptr);
+	return (NULL);
 	}
-	return (0);
+	if (ptr == NULL)
+	return (malloc(new_size));
+
+	new_ptr = malloc(new_size);
+	if (new_ptr == NULL)
+	return (NULL);
+
+	for (i = 0; i < old_size && i < new_size; i++)
+	new_ptr[i] = old_ptr[i];
+
+	free(ptr);
+	return (new_ptr);
 }
 
 /**
@@ -68,30 +84,14 @@ int handle_builtin(char **argv, shell_ctx_t *ctx)
 	}
 	if (_strcmp(argv[0], "env") == 0)
 	{
-	i = 0;
-	while (ctx->env[i])
+	for (i = 0; ctx->env[i]; i++)
 	{
 	write(STDOUT_FILENO, ctx->env[i], _strlen(ctx->env[i]));
 	write(STDOUT_FILENO, "\n", 1);
-	i++;
 	}
 	return (1);
 	}
 	return (0);
-}
-
-/**
-	* _strlen - returns string length
-	* @s: string
-	* Return: length
-	*/
-int _strlen(char *s)
-{
-	int len = 0;
-
-	while (s && s[len])
-	len++;
-	return (len);
 }
 
 /**
@@ -108,4 +108,21 @@ int _strcmp(char *s1, char *s2)
 	s2++;
 	}
 	return (*s1 - *s2);
+}
+
+/**
+	* is_delim - checks if a character is a delimiter
+	* @c: char to check
+	* @delim: delimiter string
+	* Return: 1 if true, 0 if false
+	*/
+int is_delim(char c, const char *delim)
+{
+	while (*delim)
+	{
+	if (c == *delim)
+	return (1);
+	delim++;
+	}
+	return (0);
 }

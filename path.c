@@ -1,49 +1,7 @@
 #include "shell.h"
 
 /**
-	* _strncmp - compares n characters of strings
-	* @s1: string 1
-	* @s2: string 2
-	* @n: char count
-	* Return: difference
-	*/
-int _strncmp(char *s1, char *s2, size_t n)
-{
-	size_t i;
-
-	for (i = 0; i < n && s1[i] && s2[i]; i++)
-	{
-	if (s1[i] != s2[i])
-	return (s1[i] - s2[i]);
-	}
-	if (i == n)
-	return (0);
-	return (s1[i] - s2[i]);
-}
-
-/**
-	* _strdup - duplicates a string
-	* @str: string to dup
-	* Return: pointer to new string
-	*/
-char *_strdup(char *str)
-{
-	char *dup;
-	int i, len;
-
-	if (!str)
-	return (NULL);
-	len = _strlen(str);
-	dup = malloc(sizeof(char) * (len + 1));
-	if (!dup)
-	return (NULL);
-	for (i = 0; i <= len; i++)
-	dup[i] = str[i];
-	return (dup);
-}
-
-/**
-	* build_full_path - combines dir and cmd
+	* build_full_path - combines dir and cmd without sprintf
 	* @dir: directory
 	* @command: command
 	* Return: full path string
@@ -105,4 +63,60 @@ char *find_path(char *command, char **env)
 	}
 	free(path_copy);
 	return (NULL);
+}
+
+/**
+	* _strncmp - compares n characters of strings
+	* @s1: string 1
+	* @s2: string 2
+	* @n: char count
+	* Return: difference
+	*/
+int _strncmp(char *s1, char *s2, size_t n)
+{
+	size_t i;
+
+	for (i = 0; i < n && s1[i] && s2[i]; i++)
+	{
+	if (s1[i] != s2[i])
+	return (s1[i] - s2[i]);
+	}
+	if (i == n)
+	return (0);
+	return (s1[i] - s2[i]);
+}
+
+/**
+	* _strdup - duplicates a string
+	* @str: string to dup
+	* Return: pointer to new string
+	*/
+char *_strdup(char *str)
+{
+	char *dup;
+	int i, len;
+
+	if (!str)
+	return (NULL);
+	len = _strlen(str);
+	dup = malloc(sizeof(char) * (len + 1));
+	if (!dup)
+	return (NULL);
+	for (i = 0; i <= len; i++)
+	dup[i] = str[i];
+	return (dup);
+}
+
+/**
+	* _strlen - returns string length
+	* @s: string
+	* Return: length
+	*/
+int _strlen(char *s)
+{
+	int len = 0;
+
+	while (s && s[len])
+	len++;
+	return (len);
 }

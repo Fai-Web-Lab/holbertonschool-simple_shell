@@ -1,41 +1,38 @@
 #include "shell.h"
-#include "getline.h"
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
 
 /**
-	* main - Entry point for the simple shell
-	* @argc: Argument count
-	* @argv: Argument vector
-	* @env: Environment variables
+	* main - main shell loop
 	*
 	* Return: 0 on success
 	*/
-int main(int argc, char **argv, char **env)
+int main(void)
 {
 	char *line = NULL;
 	size_t len = 0;
 	ssize_t read;
-
-	(void)argc;
-	(void)argv;
+	char *args[64];
+	int i;
+	char *token;
 
 	while (1)
 	{
-	if (isatty(STDIN_FILENO))
-	print_prompt();
+	write(STDOUT_FILENO, "$ ", 2);
 
 	read = _getline(&line, &len, STDIN_FILENO);
 	if (read == -1)
-	{
-	if (isatty(STDIN_FILENO))
-	write(STDOUT_FILENO, "\n", 1);
 	break;
-	}
 
-	if (read > 1)
-	execute_command(line, env);
+	i = 0;
+	token = strtok(line, " \t\n");
+	while (token && i < 63)
+	{
+	args[i++] = token;
+	token = strtok(NULL, " \t\n");
+	}
+	args[i] = NULL;
+
+	if (args[0])
+	execute_command(args[0], args, environ);
 	}
 
 	free(line);

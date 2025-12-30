@@ -1,62 +1,17 @@
 #include "shell.h"
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include "getline.h"
 
 /**
-<<<<<<< HEAD
-<<<<<<< HEAD
-	* main - Entry point of the shell
-	* @ac: argument count (unused)
-	* @av: argument vector (unused)
-	* @env: environment variables
-=======
-	* main - entry point of shell
->>>>>>> 6c97ab6 (working on advanced 9: simple shell 0.1.1)
-=======
-	* main - Minimal shell for setenv/unsetenv
-	* @ac: unused
-	* @av: unused
-	* @env: environment
->>>>>>> 0de24339ba50e0f0950489c943d8157701d34a98
+	* main - shell entry point
 	*
 	* Return: 0
 	*/
-int main(int ac, char **av, char **env)
+int main(void)
 {
-<<<<<<< HEAD
-	char *line = NULL;
-	size_t len = 0;
-	char **argv;
-	shell_ctx_t ctx;
-
-	(void)ac;
-	(void)av;
-
-	ctx.env = copy_env(env);
-
-	while (1)
-	{
-		if (isatty(STDIN_FILENO))
-			printf("$ ");
-
-	if (getline(&line, &len, stdin) == -1)
-	break;
-
-	argv = split_line(line);
-
-	if (handle_builtin(&ctx, argv))
-	{
-	free_tokens(argv);
-	continue;
-	}
-
-	printf("Command not supported\n");
-	free_tokens(argv);
-=======
 	char *line;
 	size_t len;
 	ssize_t read;
+	char *args[2];
 
 	line = NULL;
 	len = 0;
@@ -71,11 +26,13 @@ int main(int ac, char **av, char **env)
 	}
 
 	line[read - 1] = '\0';
+	args[0] = line;
+	args[1] = NULL;
+
 	if (*line)
 	{
-	execute_command(line, NULL);
+	execute_command(line, args);
 	}
->>>>>>> 6c97ab6 (working on advanced 9: simple shell 0.1.1)
 	}
 
 	free(line);

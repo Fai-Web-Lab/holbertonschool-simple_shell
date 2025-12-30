@@ -3,10 +3,9 @@
 /**
 	* _realloc - reallocates a memory block
 	* @ptr: old pointer
-	* @old_size: old size in bytes
-	* @new_size: new size in bytes
-	*
-	* Return: pointer to new memory block
+	* @old_size: old size
+	* @new_size: new size
+	* Return: new pointer
 	*/
 void *_realloc(void *ptr, unsigned int old_size, unsigned int new_size)
 {
@@ -22,45 +21,39 @@ void *_realloc(void *ptr, unsigned int old_size, unsigned int new_size)
 	}
 	if (ptr == NULL)
 	return (malloc(new_size));
-
 	new_ptr = malloc(new_size);
 	if (!new_ptr)
 	return (NULL);
-
 	for (i = 0; i < old_size && i < new_size; i++)
 	new_ptr[i] = old_ptr[i];
-
 	free(ptr);
 	return (new_ptr);
 }
 
 /**
-	* _strncmp - compares n characters of two strings
-	* @s1: string 1
-	* @s2: string 2
-	* @n: number of characters to compare
-	*
-	* Return: difference between strings
+	* copy_env - creates a heap-allocated copy of the environment
+	* Return: pointer to the new environment array
 	*/
-int _strncmp(char *s1, char *s2, size_t n)
+char **copy_env(void)
 {
-	size_t i;
+	int i, count = 0;
+	char **new_env;
 
-	for (i = 0; i < n && s1[i] && s2[i]; i++)
-	{
-	if (s1[i] != s2[i])
-	return (s1[i] - s2[i]);
-	}
-	if (i == n)
-	return (0);
-	return (s1[i] - s2[i]);
+	while (environ[count])
+	count++;
+	new_env = malloc(sizeof(char *) * (count + 64));
+	if (!new_env)
+	return (NULL);
+	for (i = 0; i < count; i++)
+	new_env[i] = _strdup(environ[i]);
+	new_env[i] = NULL;
+	return (new_env);
 }
 
 /**
 	* build_full_path - concatenates dir and command
-	* @dir: directory path
-	* @command: command name
-	*
+	* @dir: directory
+	* @command: command
 	* Return: full path string
 	*/
 char *build_full_path(char *dir, char *command)
@@ -71,25 +64,20 @@ char *build_full_path(char *dir, char *command)
 	full = malloc(_strlen(dir) + _strlen(command) + 2);
 	if (!full)
 	return (NULL);
-
 	for (i = 0; dir[i]; i++)
 	full[i] = dir[i];
-
 	full[i++] = '/';
-
 	for (j = 0; command[j]; j++)
 	full[i + j] = command[j];
-
 	full[i + j] = '\0';
 	return (full);
 }
 
 /**
 	* find_path - locates a command in the PATH
-	* @command: command to find
-	* @env: environment variables
-	*
-	* Return: full path or NULL if not found
+	* @command: command
+	* @env: environment
+	* Return: full path or NULL
 	*/
 char *find_path(char *command, char **env)
 {
@@ -99,7 +87,6 @@ char *find_path(char *command, char **env)
 
 	if (stat(command, &st) == 0)
 	return (_strdup(command));
-
 	while (env[i])
 	{
 	if (_strncmp(env[i], "PATH=", 5) == 0)
@@ -111,7 +98,6 @@ char *find_path(char *command, char **env)
 	}
 	if (!path_val)
 	return (NULL);
-
 	path_copy = _strdup(path_val);
 	dir = _strtok(path_copy, ":");
 	while (dir)

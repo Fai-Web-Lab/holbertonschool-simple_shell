@@ -1,10 +1,9 @@
 #include "shell.h"
 
 /**
-	* _strlen - returns the length of a string
-	* @s: string to evaluate
-	*
-	* Return: length of the string
+	* _strlen - length
+	* @s: string
+	* Return: len
 	*/
 int _strlen(char *s)
 {
@@ -16,10 +15,9 @@ int _strlen(char *s)
 }
 
 /**
-	* _strdup - duplicates a string
-	* @str: string to duplicate
-	*
-	* Return: pointer to the new string, or NULL if it fails
+	* _strdup - dup
+	* @str: string
+	* Return: pointer
 	*/
 char *_strdup(char *str)
 {
@@ -28,22 +26,19 @@ char *_strdup(char *str)
 
 	if (!str)
 	return (NULL);
-
 	len = _strlen(str);
 	dup = malloc(len + 1);
 	if (!dup)
 	return (NULL);
-
 	for (i = 0; i <= len; i++)
 	dup[i] = str[i];
-
 	return (dup);
 }
 
 /**
-	* execute_command - fork and execve a command
-	* @argv: argument vector
-	* @ctx: shell context structure
+	* execute_command - fork/exec
+	* @argv: args
+	* @ctx: context
 	*/
 void execute_command(char **argv, shell_ctx_t *ctx)
 {

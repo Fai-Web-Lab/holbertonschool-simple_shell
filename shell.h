@@ -14,10 +14,10 @@
 extern char **environ;
 
 /**
-	* struct shell_ctx - Holds the state of the shell session
-	* @exit_status: Last executed command's exit code
-	* @should_exit: Flag to stop the loop
-	* @env: Pointer to heap-allocated environment variables
+	* struct shell_ctx - Shell state
+	* @exit_status: Exit code
+	* @should_exit: Exit flag
+	* @env: Heap-allocated environment
 	*/
 typedef struct shell_ctx
 {

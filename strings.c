@@ -1,28 +1,52 @@
 #include "shell.h"
 
 /**
-	* _strcmp - compares two strings
-	* @s1: first string
-	* @s2: second string
-	*
-	* Return: 0 if equal, otherwise the difference between chars
+	* _getenv - gets the value of an environment variable
+	* @name: variable name
+	* @env: environment array
+	* Return: pointer to value or NULL
 	*/
-int _strcmp(char *s1, char *s2)
+char *_getenv(char *name, char **env)
 {
-	while (*s1 && *s2 && *s1 == *s2)
+	int i, len;
+
+	if (name == NULL || env == NULL)
+	return (NULL);
+	len = _strlen(name);
+	for (i = 0; env[i]; i++)
 	{
-	s1++;
-	s2++;
+	if (_strncmp(env[i], name, len) == 0 && env[i][len] == '=')
+	return (env[i] + len + 1);
 	}
-	return (*s1 - *s2);
+	return (NULL);
 }
 
 /**
-	* is_delim - checks if a character is a delimiter
-	* @c: char to check
-	* @delim: delimiter string
-	*
-	* Return: 1 if it is a delimiter, 0 otherwise
+	* _strncmp - compares n characters of two strings
+	* @s1: string 1
+	* @s2: string 2
+	* @n: limit
+	* Return: diff
+	*/
+int _strncmp(char *s1, char *s2, size_t n)
+{
+	size_t i;
+
+	for (i = 0; i < n && s1[i] && s2[i]; i++)
+	{
+	if (s1[i] != s2[i])
+	return (s1[i] - s2[i]);
+	}
+	if (i == n)
+	return (0);
+	return (s1[i] - s2[i]);
+}
+
+/**
+	* is_delim - checks delimiter
+	* @c: char
+	* @delim: delims
+	* Return: 1 or 0
 	*/
 int is_delim(char c, const char *delim)
 {
@@ -36,11 +60,10 @@ int is_delim(char c, const char *delim)
 }
 
 /**
-	* _strtok - custom string tokenizer that maintains state with a static pointer
-	* @str: string to tokenize
-	* @delim: delimiter string
-	*
-	* Return: pointer to the next token, or NULL
+	* _strtok - custom tokenizer
+	* @str: string
+	* @delim: delims
+	* Return: token
 	*/
 char *_strtok(char *str, const char *delim)
 {
@@ -51,17 +74,13 @@ char *_strtok(char *str, const char *delim)
 	last = str;
 	if (last == NULL || *last == '\0')
 	return (NULL);
-
 	while (*last && is_delim(*last, delim))
 	last++;
-
 	if (*last == '\0')
 	return (NULL);
-
 	token = last;
 	while (*last && !is_delim(*last, delim))
 	last++;
-
 	if (*last != '\0')
 	{
 	*last = '\0';
@@ -71,35 +90,10 @@ char *_strtok(char *str, const char *delim)
 }
 
 /**
-	* copy_env - creates a heap-allocated copy of the system environment
-	*
-	* Return: pointer to the new environment array
-	*/
-char **copy_env(void)
-{
-	int i, count = 0;
-	char **new_env;
-
-	while (environ[count])
-	count++;
-
-	new_env = malloc(sizeof(char *) * (count + 64));
-	if (!new_env)
-	return (NULL);
-
-	for (i = 0; i < count; i++)
-	new_env[i] = _strdup(environ[i]);
-	new_env[i] = NULL;
-
-	return (new_env);
-}
-
-/**
-	* _unsetenv - removes an environment variable from the shell context
-	* @argv: arguments (unsetenv VARIABLE)
-	* @ctx: shell context
-	*
-	* Return: 0 on success
+	* _unsetenv - removes env var
+	* @argv: args
+	* @ctx: context
+	* Return: 0
 	*/
 int _unsetenv(char **argv, shell_ctx_t *ctx)
 {

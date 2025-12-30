@@ -1,6 +1,12 @@
+<<<<<<< HEAD
+=======
+#include <stdlib.h>
+#include <string.h>
+>>>>>>> 0de24339ba50e0f0950489c943d8157701d34a98
 #include "shell.h"
-
+#include <stdio.h>
 /**
+<<<<<<< HEAD
 <<<<<<< HEAD
 	* copy_token - copy a substring into a new buffer
 	* @line: input line
@@ -30,58 +36,52 @@ char *copy_token(char *line, int start, int len)
 =======
 	* print_prompt - prints shell prompt
 >>>>>>> 6c97ab6 (working on advanced 9: simple shell 0.1.1)
+=======
+	* split_line - Splits a line into tokens
+	* @line: Input string
+	*
+	* Return: Array of tokens
+>>>>>>> 0de24339ba50e0f0950489c943d8157701d34a98
 	*/
 void print_prompt(void)
 {
 <<<<<<< HEAD
+<<<<<<< HEAD
 	int bufsize = 64, i = 0, start = 0, end = 0, len = 0;
 	char **tokens = malloc(sizeof(char *) * bufsize);
+=======
+	char **tokens = malloc(64 * sizeof(char *));
+	char *token;
+	int i = 0;
+>>>>>>> 0de24339ba50e0f0950489c943d8157701d34a98
 
-	if (!tokens)
-	return (NULL);
-
-	while (line[end])
+	token = strtok(line, " \t\n");
+	while (token)
 	{
-	while (line[end] == ' ' || line[end] == '\t' || line[end] == '\n')
-	end++;
-
-	start = end;
-
-	while (line[end] &&
-	line[end] != ' ' &&
-	line[end] != '\t' &&
-	line[end] != '\n')
-	end++;
-
-	if (start == end)
-	break;
-
-	len = end - start;
-	tokens[i] = copy_token(line, start, len);
-	if (!tokens[i])
-	return (NULL);
-
-	i++;
-
-	if (i >= bufsize)
-	{
-	bufsize *= 2;
-	tokens = realloc(tokens, sizeof(char *) * bufsize);
+	tokens[i++] = token;
+	token = strtok(NULL, " \t\n");
 	}
-	}
-
 	tokens[i] = NULL;
 	return (tokens);
 =======
 	write(STDOUT_FILENO, "$ ", 2);
 >>>>>>> 6c97ab6 (working on advanced 9: simple shell 0.1.1)
 }
+
 /**
+<<<<<<< HEAD
 	* print_error - prints command not found error
 	* @cmd: command name
+=======
+	* free_tokens - Frees token array
+	* @tokens: Token array
+	*
+	* Return: void
+>>>>>>> 0de24339ba50e0f0950489c943d8157701d34a98
 	*/
 void print_error(char *cmd)
 {
+<<<<<<< HEAD
 <<<<<<< HEAD
 	int i = 0;
 
@@ -94,51 +94,60 @@ void print_error(char *cmd)
 	i++;
 	}
 
+=======
+>>>>>>> 0de24339ba50e0f0950489c943d8157701d34a98
 	free(tokens);
 }
+
 /**
-	* handle_builtin - handles built-in commands
-	* @ctx: shell context
-	* @args: tokenized command
+	* copy_env - Creates a modifiable copy of the environment
+	* @env: Original environment array
 	*
-	* Description:
-	* - Supports "exit" only.
-	* - Returns 1 if built-in executed, 0 otherwise.
-	*
-	* Return: 1 if handled, 0 otherwise
+	* Return: Pointer to newly allocated environment copy, or NULL on failure
 	*/
-int handle_builtin(shell_ctx_t *ctx, char **args)
+
+char **copy_env(char **env)
 {
-	int status = ctx->exit_status;
+	int i, count = 0;
+	char **new_env;
 
-	if (!args || !args[0])
-	return (0);
+	while (env[count])
+	count++;
 
-	if (strcmp(args[0], "exit") == 0)
-	{
-	if (args[1])
-	status = atoi(args[1]);
+	new_env = malloc(sizeof(char *) * (count + 1));
+	if (!new_env)
+	return (NULL);
 
-	ctx->exit_status = status;
-	ctx->should_exit = 1;
-	return (1);
-	}
-	if (strcmp(args[0], "env") == 0)
-	{
+	for (i = 0; i < count; i++)
+	new_env[i] = strdup(env[i]);
+
+	new_env[count] = NULL;
+	return (new_env);
+}
+/**
+	* builtin_env - Prints the current environment variables
+	* @ctx: Shell context containing the environment array
+	*
+	* Return: Always 1 (indicates the command was handled)
+	*/
+
+int builtin_env(shell_ctx_t *ctx)
+{
 	int i = 0;
 
 	while (ctx->env[i])
 	{
-	write(STDOUT_FILENO, ctx->env[i], strlen(ctx->env[i]));
-	write(STDOUT_FILENO, "\n", 1);
+	printf("%s\n", ctx->env[i]);
 	i++;
 	}
-
 	return (1);
+<<<<<<< HEAD
 	}
 	return (0);
 =======
 	write(STDERR_FILENO, cmd, 0);
 	write(STDERR_FILENO, ": not found\n", 12);
 >>>>>>> 6c97ab6 (working on advanced 9: simple shell 0.1.1)
+=======
+>>>>>>> 0de24339ba50e0f0950489c943d8157701d34a98
 }

@@ -80,6 +80,8 @@ $ echo "ls" | ./hsh
 main.c hsh shell.c
 ```
 
+<img src="https://github.com/Fai-Web-Lab/holbertonschool-simple_shell/blob/main/example.jpeg?raw=true">
+
 ## Project Architecture
 ```
 ├── main.c              # Entry point & REPL loop  

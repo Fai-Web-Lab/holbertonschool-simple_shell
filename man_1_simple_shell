@@ -1,0 +1,137 @@
+.TH SIMPLE_SHELL 1
+.SH NAME
+simple_shell \- a simple UNIX command line interpreter
+
+.SH SYNOPSIS
+.B simple_shell
+.br
+.B ./hsh
+
+.SH DESCRIPTION
+simple_shell is a basic UNIX command line interpreter that reads
+commands from standard input and executes them.
+
+The shell operates in both interactive and non-interactive modes.
+In interactive mode, it displays a prompt and waits for the user to
+enter a command. In non-interactive mode, it reads commands from
+standard input without displaying a prompt.
+
+The shell reads a line of input, parses it into tokens, and executes
+the corresponding command by creating a child process using
+.BR fork (2)
+and executing the command with
+.BR execve (2).
+The parent process waits for the child process to terminate.
+
+.SH MODES
+.TP
+.B Interactive mode
+The shell displays a prompt and waits for user input. The prompt
+is displayed again after each command execution.
+
+.TP
+.B Non-interactive mode
+The shell reads commands from standard input, such as from a pipe
+or file.
+
+Example:
+.br
+echo "/bin/ls" | ./hsh
+
+.SH COMMAND EXECUTION
+The shell executes commands using the following steps:
+.IP 1.
+Read a line from standard input.
+.IP 2.
+Parse the line into command and arguments.
+.IP 3.
+Check for built-in commands.
+.IP 4.
+Search for the command in the PATH if needed.
+.IP 5.
+Create a child process using fork.
+.IP 6.
+Execute the command using execve.
+.IP 7.
+Wait for the child process to finish.
+
+.SH BUILTINS
+The following built-in commands are supported:
+
+.TP
+.B exit
+Exits the shell. No arguments are required or handled.
+
+.TP
+.B env
+Prints the current environment variables.
+
+.SH PATH HANDLING
+If the command does not contain a slash (/), the shell searches
+for the executable in the directories listed in the PATH
+environment variable.
+
+If the command contains a slash, it is executed directly without
+searching the PATH.
+
+.SH EXIT STATUS
+The exit status of the last executed command is returned by the shell.
+
+A successful command returns an exit status of 0.
+
+If a command cannot be found, the shell returns an exit status of 127.
+
+Built-in commands return 0 on success and a non-zero value on failure.
+
+.SH ERRORS
+If an executable cannot be found, an error message is printed to
+standard error and the shell continues running.
+
+The shell handles the end-of-file condition (Ctrl+D) by exiting
+gracefully.
+
+.SH LIMITATIONS
+This shell does not support:
+.IP \[bu]
+Command chaining
+.IP \[bu]
+Pipes
+.IP \[bu]
+Redirections
+.IP \[bu]
+Special characters such as ", ', \\, *, &, or #
+.IP \[bu]
+Cursor movement
+.IP \[bu]
+Advanced job control
+
+.SH EXAMPLES
+Run the shell:
+.br
+./hsh
+
+Execute a command:
+.br
+:) ls
+
+Execute a command with arguments:
+.br
+:) ls -l
+
+Print environment variables:
+.br
+:) env
+
+Exit the shell:
+.br
+:) exit
+
+.SH SEE ALSO
+sh(1), bash(1), fork(2), execve(2), wait(2), getenv(3)
+
+.SH AUTHORS
+Written by:
+.br
+Manar Talal
+.br
+fai alsharekh
